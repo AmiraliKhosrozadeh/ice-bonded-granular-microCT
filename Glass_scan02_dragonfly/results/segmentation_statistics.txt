@@ -1,0 +1,18 @@
+Segmentation Statistics (aluminum excluded from analysis)
+=================================================================
+Volume shape: (722, 587, 578) (Z, Y, X)
+Voxel size: 24.766 um
+
+Phase                           Voxels          mm3  % interior
+-----------------------------------------------------------------
+Outside air                137,529,705    2089.1235         — 
+Trapped air                    258,368       3.9247       0.27%
+Ice                         42,847,245     650.8644      44.81%
+Glass beads                 52,509,017     797.6300      54.92%
+Aluminum (excluded)         11,820,157     179.5522         — 
+
+Interior voxels (ice+glass+air): 95,614,630
+Total porosity (ice+air):    45.08%
+Air-filled porosity:         0.27%
+Ice fraction:                44.81%
+Packing fraction (glass):    54.92%

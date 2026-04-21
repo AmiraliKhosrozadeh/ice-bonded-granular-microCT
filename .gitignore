@@ -1,0 +1,48 @@
+# --- Heavy CT / Dragonfly binary data (keep out of git, GitHub caps files at 100 MB)
+*.tif
+*.tiff
+*.raw
+*.mhd
+*.nii
+*.nii.gz
+*.npy
+*.rek
+*.vol
+
+# --- Raw projection / reconstruction folders (GB-scale)
+Glass_100_1800_T5_01/
+Glass_100_1800_T5_02/
+
+# --- Dragonfly project sessions (hundreds of MB each, files or directories)
+*.ORSSession
+*.ORSSession/
+
+# --- Video files
+*.avi
+*.mp4
+*.mov
+
+# --- CT stack subfolders (hold raw TIFFs)
+**/data/
+**/segmentation/
+**/Glass-1.ORSSession/
+**/Glass-second-scan.ORSSession/
+
+# --- Bulky scan-stage artefacts
+Glass_spam/scan01/segmentation/
+Glass_spam/scan01/Glass-1.ORSSession/
+log.txt
+**/log.txt
+
+# --- Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# --- Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

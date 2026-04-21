@@ -1,0 +1,30 @@
+Scan 1 — in Dragonfly                                                                                                                                                           
+                                                                                                                                                                                  
+  Crop bounds (enter in Dragonfly's crop tool):                                                                                                                                     - X: 470 → 1046       
+  - Y: 49 → 634                                                                                                                                                                     - Z: 98 → 961                                                                                                                                                                   
+                                                                                                                                                                                  
+  Result shape: (864, 586, 577) = (Z, Y, X)                                                                                                                                       
+                                                                                                                                                                                  
+  Console commands:
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_spam\scan01_segmentation.py', encoding='utf-8').read(), globals())
+
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_spam\scan01_bead_analysis.py', encoding='utf-8').read(), globals())
+
+  ---
+  Scan 2 — in Dragonfly (new session or after unloading scan 1)
+
+  Crop bounds:
+  - X: 470 → 1046
+  - Y: 49 → 634
+  - Z: 88 → 809
+
+  Result shape: (722, 586, 577) = (Z, Y, X)
+
+  Console commands:
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_scan02_dragonfly\scan02_histogram_analysis.py', encoding='utf-8').read(), globals())
+
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_scan02_dragonfly\scan02_segmentation.py', encoding='utf-8').read(), globals())
+
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_scan02_dragonfly\scan02_bead_analysis.py', encoding='utf-8').read(), globals())
+
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_scan02_dragonfly\scan02_porosity_analysis.py', encoding='utf-8').read(), globals())

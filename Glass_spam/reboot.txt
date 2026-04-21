@@ -1,0 +1,45 @@
+Installation for users
+If you are on Linux or OSX, good news, installation is easy!
+
+If you are on Windows please install a Debian/Ubuntu WSL (Windows Subsystem for Linux) and then follow this guide.
+
+If you want to use docker then please follow Use the spam docker image
+
+OK, let’s get started, you just need to issue the following commands:
+
+$ # install minimal system deps
+$ sudo apt install python3 python3-venv libglu1-mesa libxrender1 libxcursor1 libxft2 libxinerama1 libgomp1
+$ # Create a virtual environment
+$ /usr/bin/python3 -m venv spam-venv
+$ # Activate your virtual environment
+$ source spam-venv/bin/activate
+$ # update python package manager
+$ pip install -U pip
+$ # install spam
+$ pip install spam
+Note
+
+On OSX if you have complaints about the gmp library, please brew install gmp
+
+If the creation of the virtual environment fails, you can try to install the venv module of python on your system. On Ubuntu this is simply apt install python3-venv. More details on the python virtual environment.
+
+After sourcing the virtual environment you’ll see (spam-venv) in front of your terminal prompt. This means that you have activated this python virtual environment. When you open a new terminal, you will have to re-activate your environment to have access to spam
+
+spam should now be installed! You can try the following command to check:
+
+ spam-ldic --help
+If it prints out the options of the programme with no errors you’re good to go! If needed please visit: Install a spam jupyter kernel.
+
+How to use
+In order to use spam you will always have to activate its virtual environment where it is installed:
+
+source /path/to/spam/venv/bin/activate
+ 
+Using spam in your scripts
+You can include spam in your own scripts by importing different modules (see module index)
+
+import spam.DIC
+A lot of spam functionalities are available as atomic functions. Please refer to the Gallery of Examples for use of spam functions in python.
+
+Using existing spam scripts
+We also provide more sophisticated functionality in spam-scripts,

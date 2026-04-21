@@ -1,0 +1,32 @@
+Glass Bead PSD Statistics (CT micro-CT analysis)
+==================================================
+
+Total beads:          282
+Total glass volume:   798.7077 mm3
+
+Size measure used for PSD: Mean Feret diameter
+D10:                  1717.8 um
+D50:                  1777.4 um
+D90:                  1857.3 um
+Span (D90-D10)/D50:   0.078
+
+Equivalent diameter:
+  Min:                1574.5 um
+  Max:                2028.0 um
+  Mean:               1753.8 um
+  Median:             1751.6 um
+  Std:                52.3 um
+
+Mean Feret diameter (13 directions):
+  Min:                1620.7 um
+  Max:                2828.2 um
+  Mean:               1804.1 um
+  Median:             1794.9 um
+  Std:                99.7 um
+
+Volume per bead:
+  Mean:               2.832297 mm3
+
+Sphericity:
+  Mean:               0.843
+  Median:             0.846

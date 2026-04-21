@@ -1,0 +1,168 @@
+The missing part is not the segmentation itself. The code runs as a standalone Python TIFF workflow, but it never creates a **Dragonfly workspace object** from the NumPy result.
+
+What is missing:
+
+1. **Create a Dragonfly Channel or ROI from the NumPy array**
+
+   * `seg` and `seg_display` are plain NumPy arrays.
+   * Dragonfly will not show them automatically unless they are converted into a Dragonfly `Channel` or `ROI`.
+
+2. **Publish the object to the Dragonfly workspace**
+
+   * After creating the Dragonfly object, call:
+
+   ```python
+   dragonfly_channel.publish()
+   ```
+
+   or for ROI:
+
+   ```python
+   roi.publish()
+   ```
+
+3. **Refresh/display the ROI if needed**
+
+   * For ROI objects, after editing voxels, also call:
+
+   ```python
+   roi.show()
+   ```
+
+4. **Possibly fix axis order**
+
+   * My array is currently shaped `(Z, Y, X)`.
+   * Dragonfly may expect a different axis order when creating a channel from NumPy.
+   * If the object appears incorrectly oriented or not as expected, try transposing before creating the Dragonfly channel.
+
+What I need from you:
+
+* Add a final section that converts `seg_display` into a Dragonfly `Channel` and publishes it.
+* Optionally also add code to create separate ROIs for each label:
+
+  * trapped air
+  * ice
+  * glass
+  * aluminum
+
+The key point:
+**Saving TIFF files is not enough for Dragonfly workspace visualization.**
+I need code that explicitly creates and publishes the result inside Dragonfly.
+
+
+
+
+more detail if needed.
+Your segmentation code itself looks fine as a standalone TIFF workflow. The missing part is the Dragonfly-specific section that creates a Dragonfly Channel or ROI, publishes it, and refreshes it so it appears in the workspace.
+
+Thought for 38s
+
+Write this after your script only if you are running it inside Dragonfly’s Python console / script environment.
+
+Your current script saves TIFFs correctly, but that alone does not create a Dragonfly workspace object. To make something appear in Dragonfly, you need to create a Dragonfly Channel from the NumPy array and then call publish(). Dragonfly’s own example for “create a Channel from a Numpy Array” shows exactly that pattern: createChannelFromNumpyArray(...) followed by publish().
+
+Use this block:
+
+# ── 8. Create Dragonfly channel directly from NumPy array ─────────────────────
+try:
+    from ORSModel import createChannelFromNumpyArray
+
+    print("\nStep 8: Creating Dragonfly channel from segmentation array...")
+
+    # Dragonfly accepts common scalar numpy dtypes such as uint8
+    seg_df = seg_display.astype(np.uint8)
+
+    # Create Dragonfly channel
+    dragonfly_channel = createChannelFromNumpyArray(seg_df)
+
+    # Give it a title
+    dragonfly_channel.setTitle("Segmentation_5phase")
+
+    # Make Dragonfly aware of the new dataset
+    dragonfly_channel.publish()
+
+    print("  Dragonfly channel published successfully.")
+    print("  Name in workspace: Segmentation_5phase")
+
+except Exception as e:
+    print("\nStep 8 FAILED: Could not publish channel to Dragonfly")
+    print("Reason:", e)
+
+That is the minimum missing part for a channel.
+
+A second likely issue is orientation. Your NumPy array is shaped (Z, Y, X), while Dragonfly examples create channels directly from NumPy arrays but do not guarantee that every external workflow’s axis order will match your expected display orientation. If the channel appears but looks rotated or wrong, try:
+
+seg_df = np.transpose(seg_display, (2, 1, 0)).astype(np.uint8)
+
+or
+
+seg_df = np.transpose(seg_display, (1, 2, 0)).astype(np.uint8)
+
+and publish again. The key requirement is still the same: create a Dragonfly Channel object and publish() it.
+
+If you want the result as ROIs instead of one label channel, create one ROI per label. In Dragonfly’s ROI workflow, the usual pattern is:
+
+create ROI with the same shape as the reference structured grid,
+fill or paint it,
+call publish(),
+and after edits call show() so it refreshes in the display. Dragonfly’s docs explicitly describe creating ROIs from a structured grid and publishing them, and note that ROI display updates may require show().
+
+Example for one ROI:
+
+# ── 9. Optional: create ROIs for each phase ───────────────────────────────────
+try:
+    from ORSModel import ROI, orsColor, createChannelFromNumpyArray
+
+    print("\nStep 9: Creating ROIs for each phase...")
+
+    # Use the original volume only as shape reference
+    ref_channel = createChannelFromNumpyArray(volume.astype(np.uint16))
+    ref_channel.setTitle("ReferenceVolume_temp")
+    ref_channel.publish()
+
+    phase_defs = [
+        (LABEL_TRAPPED_AIR, "ROI_TrappedAir", orsColor(1.0, 0.0, 0.0, 1.0)),
+        (LABEL_ICE,         "ROI_Ice",        orsColor(0.3, 0.7, 1.0, 1.0)),
+        (LABEL_GLASS,       "ROI_Glass",      orsColor(0.9, 0.8, 0.5, 1.0)),
+        (LABEL_ALUMINUM,    "ROI_Aluminum",   orsColor(0.8, 0.8, 0.8, 1.0)),
+    ]
+
+    for lbl, title, color in phase_defs:
+        roi = ROI()
+        roi.setTitle(title)
+        roi.copyShapeFromStructuredGrid(ref_channel)
+        roi.setInitialColor(color)
+
+        # NOTE:
+        # This only creates the ROI shell with correct shape.
+        # To actually fill voxels, you need to copy the boolean mask into the ROI
+        # using a Dragonfly-supported ROI fill/copy method available in your version.
+
+        roi.publish()
+        roi.show()
+        print(f"  Published ROI shell: {title}")
+
+except Exception as e:
+    print("\nStep 9 FAILED:", e)
+
+Important detail: the block above publishes ROI containers, but the exact voxel-filling call depends on your Dragonfly version and available API helpers. That is why the safer first step is to publish the segmentation as a channel, because that part is directly documented and reliable.
+
+So the practical answer is:
+
+If you want it visible immediately in Dragonfly, add the Step 8 channel block.
+If it still does not appear, you are probably running the script in external Python, not Dragonfly’s embedded Python console. In that case Dragonfly cannot receive publish() objects, and your TIFF-import workflow is the correct one.
+If you want real ROIs, do it in two steps:
+publish the label channel first,
+then generate per-label ROIs from that channel using Dragonfly API calls.
+
+The shortest working addition is this:
+
+from ORSModel import createChannelFromNumpyArray
+dragonfly_channel = createChannelFromNumpyArray(seg_display.astype(np.uint8))
+dragonfly_channel.setTitle("Segmentation_5phase")
+dragonfly_channel.publish()
+
+If you paste the exact error or tell me your Dragonfly version, I can rewrite your script into a version that creates either:
+
+one visible label channel, or
+four visible ROIs for trapped air, ice, glass, and aluminum.

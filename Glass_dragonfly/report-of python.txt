@@ -1,0 +1,89 @@
+exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation.py', encoding='utf-8').read(), globals())
+============================================================
+Step 1: Loading full cropped volume...
+  Files: Glass-1001800-T5-normal_100XXL_uc_xy_0098.tif  ->  Glass-1001800-T5-normal_100XXL_uc_xy_0961.tif
+  Crop:  X 565-1008  Y 117-548  (444 x 432 px)
+  Loaded 100 slices...
+  Loaded 200 slices...
+  Loaded 300 slices...
+  Loaded 400 slices...
+  Loaded 500 slices...
+  Loaded 600 slices...
+  Loaded 700 slices...
+  Loaded 800 slices...
+Volume shape : (864, 432, 444)  (Z, Y, X)
+Dtype        : uint16
+Loaded in 1.3s
+
+Step 1b: Applying 3D median filter (size=3)...
+  Filtered in 49.7s
+
+Step 2: Building specimen mask via per-slice contour detection...
+  Contour mask built in 2.1s
+  Method: 'contour'
+  Inside specimen :   59,244,432 voxels
+  Outside specimen:  106,477,680 voxels
+
+Step 3: Thresholding phases inside specimen...
+  Using manual T_AIR_ICE = 6800
+
+Step 3b: Skipped (contour mask — no outside-air ring). Trapped air inside specimen: 72,189 voxels
+
+Step 3c: Removing ice clusters smaller than 2000 voxels...
+  Ice components: 352907 total, 352872 removed (< 2000 vox)
+  Ice voxels: 2,613,419 -> 1,896,110 (removed 717,309)
+  Removing glass clusters smaller than 10 voxels...
+  Glass components: 276 total, 108 removed (< 10 vox)
+  Glass voxels: 54,044,847 -> 54,044,439 (removed 408)
+
+Step 4: Final segmentation statistics
+============================================================
+  Outside air              :  106,477,680 voxels |  1617.4326 mm3 | 64.25% total | 179.73% specimen
+  Trapped air (inside)     :       72,189 voxels |     1.0966 mm3 |  0.04% total |  0.12% specimen
+  Ice                      :    1,896,518 voxels |    28.8088 mm3 |  1.14% total |  3.20% specimen
+  Glass beads              :   54,044,439 voxels |   820.9536 mm3 | 32.61% total | 91.22% specimen
+  Aluminum                 :    3,231,286 voxels |    49.0843 mm3 |  1.95% total |  5.45% specimen
+============================================================
+
+  Ice fraction of specimen       : 3.20%
+  Total pore fraction (ice+air)  : 3.32%
+
+Step 5: Saving segmentation TIFF stack to:
+  E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation
+  Saved slice 0/863
+  Saved slice 100/863
+  Saved slice 200/863
+  Saved slice 300/863
+  Saved slice 400/863
+  Saved slice 500/863
+  Saved slice 600/863
+  Saved slice 700/863
+  Saved slice 800/863
+  All slices saved.
+  Display values: 0=outside air  50=trapped air  100=ice  150=glass  200=aluminum
+
+Step 6: Saving overview images...
+  Overview saved to:
+  E:\RPTU-images\CT_images\Glass\Glass_dragonfly\results\segmentation_overview.png
+
+Step 6b: Saving contour-detection QC figure (Fig 3.15 style)...
+  Saved: E:\RPTU-images\CT_images\Glass\Glass_dragonfly\results\contour_detection_workflow.png
+
+============================================================
+DONE.
+Segmentation labels: 0=outside air  1=trapped air  2=ice  3=glass  4=aluminum
+Output folder: E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation
+
+Step 7: Creating ROIs in Dragonfly...
+  Channel.getClassNameStatic() = 'CxvChannel'
+  getAllObjectsOfClass('CxvChannel') -> 2 channels
+    Channel: Glass-1001800-T5-normal_100XXL_uc_xy_0098
+  --> Using this as CT channel
+    Channel: Grey Channel215 UBYTE
+  Temporary channel published.
+  Published ROI: ROI_TrappedAir (via makeROIForChannel)
+  Published ROI: ROI_Ice (via makeROIForChannel)
+  Published ROI: ROI_GlassBeads (via makeROIForChannel)
+  Published ROI: ROI_Aluminum (via makeROIForChannel)
+  Temporary channel deleted.
+  Done -- 4 ROIs created.

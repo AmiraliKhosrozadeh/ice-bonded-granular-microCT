@@ -1,0 +1,24 @@
+Glass Bead PSD Statistics (CT micro-CT analysis)
+==================================================
+
+Total beads:          282
+Total glass volume:   795.7590 mm3
+
+D10:                  1681.1 um
+D50:                  1742.7 um
+D90:                  1813.2 um
+Span (D90-D10)/D50:   0.076
+
+Equivalent diameter:
+  Min:                1384.9 um
+  Max:                2024.7 um
+  Mean:               1751.3 um
+  Median:             1751.7 um
+  Std:                58.6 um
+
+Volume per bead:
+  Mean:               2.821841 mm3
+
+Sphericity:
+  Mean:               0.910
+  Median:             0.921

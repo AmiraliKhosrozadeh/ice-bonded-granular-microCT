@@ -1,0 +1,98 @@
+I’m verifying the exact Dragonfly signatures for getLabelization(...) and whether there’s a better MultiROI path than keeping the labeled channel, so I can pin this down instead of guessing again.
+
+Thought for 19s
+
+Now we know exactly why it failed.
+
+getLabelization in Dragonfly is not:
+
+label_ch.getLabelization(0, 0, 0, nx-1, ny-1, nz-1)
+
+It actually requires 13 arguments:
+
+getLabelization(
+    minX, minY, minZ,
+    maxX, maxY, maxZ,
+    iTIndex,
+    min, max,
+    considerDiagonal,
+    IProgress,
+    pInVolumeROI,
+    pOutData
+)
+
+The Dragonfly docs say it labels adjacent voxels and returns a MultiROI; if you pass an output MultiROI, it writes into it, otherwise it creates a new one.
+
+And getAsMultiROI is also not zero-argument. Its signature is:
+
+getAsMultiROI(inOutStructuredGrid, IProgress)
+
+It converts a structured grid to a MultiROI, and if the source is a channel, the output MultiROI will contain a label for every non-zero channel value.
+
+So your script failed because it only passed the bounding box. After that failure, your own fallback path renamed the temporary label channel to Glass_Beads_Labeled, which is why you ended up with a channel instead of a real MultiROI. The docs also confirm publish() is what makes an object show up in the Dragonfly UI.
+
+What Claude should change
+
+The cleanest next try is actually getAsMultiROI(None, None) first, because your labeled channel already contains bead IDs 1…282, and the docs say a channel source becomes a MultiROI with one label for every non-zero channel value.
+
+If that fails in your binding, then use the full getLabelization(...) call.
+
+Replace your current Step 12C with this
+        # -- C: create MultiROI from labeled channel ---------------------------
+        multi_roi = None
+
+        # First try: direct channel -> MultiROI conversion
+        try:
+            multi_roi = label_ch.getAsMultiROI(None, None)
+            print("  MultiROI created via label_ch.getAsMultiROI(None, None)")
+        except Exception as e:
+            print(f"  getAsMultiROI(None, None) failed: {e}")
+
+        # Second try: full getLabelization signature
+        if multi_roi is None:
+            try:
+                nz_b, ny_b, nx_b = bead_labels.shape
+                multi_roi = label_ch.getLabelization(
+                    0, 0, 0,                  # minX, minY, minZ
+                    nx_b - 1, ny_b - 1, nz_b - 1,   # maxX, maxY, maxZ
+                    0,                        # iTIndex
+                    1, float(n_beads),       # min, max label values
+                    True,                     # considerDiagonal
+                    None,                     # IProgress
+                    None,                     # pInVolumeROI
+                    None                      # pOutData
+                )
+                print("  MultiROI created via full getLabelization(...)")
+            except Exception as e:
+                print(f"  full getLabelization(...) failed: {e}")
+
+        if multi_roi is not None:
+            multi_roi.setTitle('Glass_Beads_MultiROI')
+            multi_roi.publish()
+            print(f"  Published: Glass_Beads_MultiROI ({n_beads} beads)")
+
+            try:
+                label_ch.deleteObject()
+                print("  Temporary label channel deleted.")
+            except Exception as e_del:
+                print(f"  WARNING: could not delete temp label channel: {e_del}")
+        else:
+            label_ch.setTitle('Glass_Beads_Labeled')
+            print("  MultiROI creation failed. Kept labeled channel: Glass_Beads_Labeled")
+Why this is the right fix
+getAsMultiROI(None, None) matches the documented 2-argument signature.
+getLabelization(...) now uses the complete documented signature instead of the incomplete 6-argument call.
+publish() is still correct for making the MultiROI appear in the UI.
+One small note
+
+For getLabelization(...), I set:
+
+min = 1
+max = float(n_beads)
+
+because your channel labels are bead IDs from 1 to 282, and background is 0. That is the most sensible range for your case.
+
+So the next step is simple:
+
+keep your watershed and measurements unchanged
+only replace the MultiROI conversion block with the code above

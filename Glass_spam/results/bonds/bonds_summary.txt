@@ -1,0 +1,22 @@
+BOND ANALYSIS SUMMARY (scan 1 vs scan 2)
+============================================================
+
+Dilation before contact detection: 3 voxels
+
+[Scan 1] bonds = 937,  mean Z = 6.65,  median = 6.5
+[Scan 2] bonds = 742,  mean Z = 5.38,  median = 5.5
+
+Surviving bonds   : 90  (9.6% of scan-1)
+Broken bonds      : 847  (90.4% of scan-1)
+New bonds         : 652  (87.9% of scan-2)
+
+Per-bond strain (scan-1 bonds with DDIC data, n=937):
+  min    : -0.9953
+  median : +0.0624
+  max    : +2.4873
+  std    : 0.4460
+
+Contact inclination vs horizontal (higher = more vertical):
+  scan 1: mean 34.9° median 30.4°
+  scan 2: mean 34.6° median 31.0°
+  delta : -0.3° (positive = contacts rotated toward vertical under compression)

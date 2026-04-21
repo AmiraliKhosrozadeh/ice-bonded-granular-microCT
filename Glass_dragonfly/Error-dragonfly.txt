@@ -1,0 +1,22 @@
+exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation.py').read(), globals())
+---------------------------------------------------------------------------
+RuntimeError                              Traceback (most recent call last)
+File E:\Dragonfly\Python_env\lib\site-packages\jupyter_core\utils\__init__.py:154, in run_sync.<locals>.wrapped(*args, **kwargs)
+    153 try:
+--> 154     asyncio.get_running_loop()
+    155 except RuntimeError:
+    156     # No loop running, run the loop for this thread.
+
+RuntimeError: no running event loop
+
+During handling of the above exception, another exception occurred:
+
+UnicodeDecodeError                        Traceback (most recent call last)
+Cell In[20], line 1
+----> 1 exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation.py').read(), globals())
+
+File E:\Dragonfly\Python_env\lib\encodings\cp1252.py:23, in IncrementalDecoder.decode(self, input, final)
+     22 def decode(self, input, final=False):
+---> 23     return codecs.charmap_decode(input,self.errors,decoding_table)[0]
+
+UnicodeDecodeError: 'charmap' codec can't decode byte 0x90 in position 13393: character maps to <undefined>

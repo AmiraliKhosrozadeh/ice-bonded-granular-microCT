@@ -1,0 +1,3775 @@
+class ORSModel.ors.MultiROI(*args, **kwargs)
+Bases: MultiROIAbstract
+
+Container for multiple ROIs.
+
+class COLOR_SLOT(value)
+Bases: IntEnum
+
+An enumeration.
+
+addAllUnlabeledVoxelsToLabel(self, label: int)
+Adds all unlabeled voxels, giving them a specific label.
+
+Parameters:
+label (int) – the label (a uint32_t)
+
+addIndexIntervalToLabel(self, anIndex0: int, anIndex1: int, aLabel: int)
+Adds index interval to the given label.
+
+Parameters:
+anIndex0 (int) – the index0 (a uint64_t)
+
+anIndex1 (int) – the index1 (a uint64_t)
+
+aLabel (int) – the label (a uint32_t)
+
+addIndexToLabel(self, anIndex: int, aLabel: int)
+Adds an Index to the given label.
+
+Parameters:
+anIndex (int) – the index (a uint64_t)
+
+aLabel (int) – the label (a uint32_t)
+
+addToVolumeROI(self, pOutputROI: ORSModel.ors.ROI, pLabel: int)
+Adds all the voxels associated to a label to a VolumeROI.
+
+Note The ROI is not cleared prior to adding.
+See also ORSModel.ors.StructuredGrid.getAsROI(), ORSModel.ors.MultiROIAbstract.removeROI()
+Parameters:
+pOutputROI (ORSModel.ors.ROI) – the output Volume ROI (a ROI)
+
+pLabel (int) – the label to extract (a uint32_t)
+
+addToVolumeROILabelAtIndex(self, pOutputROI: ORSModel.ors.ROI, pIndex: int)
+Finds the label at a given index, then extracts the label data and adds it to a VolumeROI.
+
+See also addToROI(), ORSModel.ors.MultiROIAbstract.removeROI()
+Parameters:
+pOutputROI (ORSModel.ors.ROI) – the output Volume ROI (an ROI)
+
+pIndex (int) – the index (an int64_t)
+
+addToVolumeROILabelAtPosition(self, pOutputROI: ORSModel.ors.ROI, tIndex: int, pVector: ORSModel.ors.Vector3)
+Finds the label at a given position, then extracts the label data and adds it to aROI.
+
+See also addToROI(), ORSModel.ors.MultiROIAbstract.removeROI()
+Parameters:
+pOutputROI (ORSModel.ors.ROI) – the output ROI (a ROI)
+
+tIndex (int) – the T value (a uint32_t)
+
+pVector (ORSModel.ors.Vector3) – the position (a Vector3)
+
+addVolumeROIToLabel(self, aLabel: int, pROI: ORSModel.ors.ROI, pTOffset: int = 0) → bool
+Adds anROI to the given label.
+
+Parameters:
+aLabel (int) – the label (a uint32_t)
+
+pROI (ORSModel.ors.ROI) – the ROI to add (an ROI)
+
+pTOffset (int) – the faculative time Offset
+
+Returns:
+output (bool) – true if succeeded, false otherwise
+
+addVolumeROIToLabelConstrained(self, aLabel: int, pROI: ORSModel.ors.ROI, sourceLabels: ORSModel.ors.ArrayUnsignedLong, pTOffset: int = 0) → bool
+Parameters:
+aLabel (int) –
+
+pROI (ORSModel.ors.ROI) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+pTOffset (int) –
+
+Returns:
+output (bool) –
+
+appendMultiROI(self, pLabeledMultiROI: ORSModel.ors.MultiROI, pLabelArray: ORSModel.ors.ArrayUnsignedLong)
+Parameters:
+pLabeledMultiROI (ORSModel.ors.MultiROI) –
+
+pLabelArray (ORSModel.ors.ArrayUnsignedLong) –
+
+assignDefaultColors()
+Helper to assign default color to an instance of a MultiROI
+
+clear(self)
+Clears the entire data.
+
+Note All label information is lost (scalars, colors, names, etc).
+clearAllLabels(self)
+Clears (empties) all labels for all Ts.
+
+Note All label information is preserved (scalars, colors, names, etc).
+clearAllLabelsForTIndex(self, tIndex: int)
+Clears (empties) all labels for a specific T index.
+
+Note All label information is preserved (scalars, colors, names, etc).
+Parameters:
+tIndex (int) – a timeStep (uint32_t)
+
+clearLabel(self, pLabel: int)
+Clears a label.
+
+Parameters:
+pLabel (int) – the label to clear (a uint32_t)
+
+clearLabels(self, pLabelArray: ORSModel.ors.ArrayUnsignedLong)
+Clears a set of labels.
+
+Parameters:
+pLabelArray (ORSModel.ors.ArrayUnsignedLong) – an array of labels to clear (an ArrayUnsignedLong)
+
+clearLabelsForTIndex(self, labels: ORSModel.ors.ArrayUnsignedLong, tIndex: int)
+Clears (empties) specific Labels for a specific T index.
+
+Note All label information is preserved (scalars, colors, names, etc).
+Parameters:
+labels (ORSModel.ors.ArrayUnsignedLong) – Labels to be cleared
+
+tIndex (int) – a timeStep (uint32_t)
+
+computeDenseGraphFromMultiROI(self, IProgress: ORSModel.ors.Progress) → ORSModel.ors.Graph
+Computes the graph of theMultiROI’s connectivity.
+
+Note The receiver MultiROI should already be skeletonized. The receiver should be a proper skeleton without any surface
+Parameters:
+IProgress (ORSModel.ors.Progress) – a progress object (an Progress)
+
+Returns:
+output (ORSModel.ors.Graph) – graph of the MultiROI’s connectivity
+
+copyInto(self, aMultiROI: ORSModel.ors.MultiROI)
+Copies the receiver into another Multi-ROI.
+
+Parameters:
+aMultiROI (ORSModel.ors.MultiROI) – a destination multiROI (an MultiROI)
+
+copyLabelAndScalarInformationInto(self, pDestinationMultiROI: ORSModel.ors.MultiROI)
+Copy scalars, labels color, opacity and title into pDestinationMultiROI.
+
+Parameters:
+pDestinationMultiROI (ORSModel.ors.MultiROI) –
+
+copyLabelInformationInto(self, pDestinationMultiROI: ORSModel.ors.MultiROI)
+Copy labels color, opacity and title into pDestinationMultiROI.
+
+Parameters:
+pDestinationMultiROI (ORSModel.ors.MultiROI) –
+
+copyScalarInformationInto(self, pDestinationMultiROI: ORSModel.ors.MultiROI)
+Copy scalars into pDestinationMultiROI.
+
+Parameters:
+pDestinationMultiROI (ORSModel.ors.MultiROI) –
+
+crossIndexing(self, multiROIToIntersectWith: ORSModel.ors.MultiROI) → ORSModel.ors.ArrayUnsignedLong
+cross-indexing with labels from another multiROI
+
+Parameters:
+multiROIToIntersectWith (ORSModel.ors.MultiROI) – the other multi ROI to cross-index with
+
+Returns:
+output (ORSModel.ors.ArrayUnsignedLong) –
+
+emptyLabelIntersectingROI(self, pInputROI: ORSModel.ors.ROI) → bool
+Empty labels that are intersecting the givenROI.
+
+Parameters:
+pInputROI (ORSModel.ors.ROI) –
+
+Returns:
+output (bool) – return true if label where removed (a bool)
+
+emptyLabelNotIntersectingROI(self, pInputROI: ORSModel.ors.ROI) → bool
+Empty labels that are not intersecting the givenROI.
+
+Parameters:
+pInputROI (ORSModel.ors.ROI) –
+
+Returns:
+output (bool) – return true if label where removed (a bool)
+
+fillAllInnerHoles2DAlongXAxis(self, labels: ORSModel.ors.ArrayUnsignedLong, iTIndex: int, considerDiagonal: bool)
+Note This method fills the interior of a MultiROI for each 2D slice along the X axis.
+Note Only those labels specified are filled, in the order they are supplied in.
+Note This method fills a MultiROI’s interior by looking for escape openings. Using 26 neighbors enforces more rigidity in the algorithm to determine if a neighboring voxel is an opening or not.
+Parameters:
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to fill (an ArrayUnsignedLong)
+
+iTIndex (int) – the T index (a uint32_t)
+
+considerDiagonal (bool) – true to use 26 neighbors, false to use 6 neighbors (see note below)
+
+fillAllInnerHoles2DAlongYAxis(self, labels: ORSModel.ors.ArrayUnsignedLong, iTIndex: int, considerDiagonal: bool)
+Note This method fills the interior of a MultiROI for each 2D slice along the Y axis.
+Note Only those labels specified are filled, in the order they are supplied in.
+Note This method fills a MultiROI’s interior by looking for escape openings. Using 26 neighbors enforces more rigidity in the algorithm to determine if a neighboring voxel is an opening or not.
+Parameters:
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to fill (an ArrayUnsignedLong)
+
+iTIndex (int) – the T index (a uint32_t)
+
+considerDiagonal (bool) – true to use 26 neighbors, false to use 6 neighbors (see note below)
+
+fillAllInnerHoles2DAlongZAxis(self, labels: ORSModel.ors.ArrayUnsignedLong, iTIndex: int, considerDiagonal: bool)
+Note This method fills the interior of a MultiROI for each 2D slice along the Z axis.
+Note Only those labels specified are filled, in the order they are supplied in.
+Note This method fills a MultiROI’s interior by looking for escape openings. Using 26 neighbors enforces more rigidity in the algorithm to determine if a neighboring voxel is an opening or not.
+Parameters:
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to fill (an ArrayUnsignedLong)
+
+iTIndex (int) – the T index (a uint32_t)
+
+considerDiagonal (bool) – true to use 26 neighbors, false to use 6 neighbors (see note below)
+
+fillInnerHoles(self, labels: ORSModel.ors.ArrayUnsignedLong, iTIndex: int, considerDiagonal: bool)
+Note This method fills a MultiROI’s interior by looking for escape openings. Using 26 neighbors enforces more rigidity in the algorithm to determine if a neighboring voxel is an opening or not.
+Note Only those labels specified are filled, in the order they are supplied in.
+Note When trying to close a 2D MultiROI (for example a circle), you need to work with a 2D MultiROI (i.e. Z size = 1).
+Parameters:
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to fill (an ArrayUnsignedLong)
+
+iTIndex (int) – the T index (a uint32_t)
+
+considerDiagonal (bool) – true to use 26 neighbors, false to use 6 neighbors (see note below)
+
+fillWithCell(self, xCellSize: int, yCellSize: int, zCellSize: int, temporalCell: bool)
+Clear the Muti-ROI and fill it with a grid of label.
+
+Parameters:
+xCellSize (int) – the cell size in X (a uint32_t)
+
+yCellSize (int) – the cell size in Y (a uint32_t)
+
+zCellSize (int) – the cell size in Z (a uint32_t)
+
+temporalCell (bool) – new label per T or same label across T dimension (a bool)
+
+fromChannel(self, pChan: ORSModel.ors.Channel)
+Parameters:
+pChan (ORSModel.ors.Channel) –
+
+generateAnalyzer(self, inputChannel: ORSModel.ors.Channel, pROI: ORSModel.ors.ROI, aTimeStep: int, pStats: int, pCompute2DStats: bool, IProgress: ORSModel.ors.Progress) → ORSModel.ors.MultiROIAnalyzer
+Parameters:
+inputChannel (ORSModel.ors.Channel) –
+
+pROI (ORSModel.ors.ROI) –
+
+aTimeStep (int) –
+
+pStats (int) –
+
+pCompute2DStats (bool) –
+
+IProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.MultiROIAnalyzer) –
+
+get2DZAlignedProjection(self, iTIndex: int) → ORSModel.ors.MultiROI
+flatten the z axis of a multiROI
+
+Parameters:
+iTIndex (int) – the time step (a uint32_t)
+
+Returns:
+output (ORSModel.ors.MultiROI) –
+
+getAsArray(self, tIndex: int, pOutputArray: ORSModel.ors.ArrayUnsignedLong) → ORSModel.ors.ArrayUnsignedLong
+Extracts the labels and adds them all to anArray.
+
+Note If an output Array is supplied, data is written to it and returned, otherwise a new Array is created.
+Note The Array is cleared prior to adding.
+See also ORSModel.ors.StructuredGrid.getAsROI(), asChannel()
+Parameters:
+tIndex (int) – time index (a uint32_t)
+
+pOutputArray (ORSModel.ors.ArrayUnsignedLong) – an optional output Array (an ArrayUnsignedLong)
+
+Returns:
+output (ORSModel.ors.ArrayUnsignedLong) – the resulting Array (an ArrayUnsignedLong)
+
+getAsChannelWithLabelOffset(self, labelOffset: int, pOutputChannel: ORSModel.ors.Channel) → ORSModel.ors.Channel
+Extracts the labels and adds them all to a channel.
+
+Note If an output channel is supplied, data is written to it and returned, otherwise a new channel is created.
+Note The channel’s data type is determined by the total number of labels within:
+See also asROI()
+Parameters:
+labelOffset (int) – a label offset to add to output channel values (a uint32_t)
+
+pOutputChannel (ORSModel.ors.Channel) – an optional output channel (an Channel)
+
+Returns:
+output (ORSModel.ors.Channel) – the resulting channel (an Channel)
+
+getAsCubicMesh(self, bWorld: bool, IProgress: ORSModel.ors.Progress, IInMesh: ORSModel.ors.Mesh) → ORSModel.ors.Mesh
+Parameters:
+bWorld (bool) –
+
+IProgress (ORSModel.ors.Progress) –
+
+IInMesh (ORSModel.ors.Mesh) –
+
+Returns:
+output (ORSModel.ors.Mesh) –
+
+getAsCubicMeshForTIndex(self, bWorld: bool, timeStep: int, IProgress: ORSModel.ors.Progress, IInMesh: ORSModel.ors.Mesh) → ORSModel.ors.Mesh
+Note If a target Mesh is supplied, data is written to it and returned, otherwise a new Mesh is created.
+Parameters:
+bWorld (bool) – the time step to extract from the receiver (a uint32_t)
+
+timeStep (int) – a progress object to show no progress (an Progress)
+
+IProgress (ORSModel.ors.Progress) – an optional target mesh model (a Mesh)
+
+IInMesh (ORSModel.ors.Mesh) –
+
+Returns:
+output (ORSModel.ors.Mesh) – the resulting mesh model (an Mesh)
+
+getAsCubicMeshSubset(self, IEnabledLabel: ORSModel.ors.ArrayChar, bWorld: bool, IProgress: ORSModel.ors.Progress, IInMesh: ORSModel.ors.Mesh) → ORSModel.ors.Mesh
+Parameters:
+IEnabledLabel (ORSModel.ors.ArrayChar) –
+
+bWorld (bool) –
+
+IProgress (ORSModel.ors.Progress) –
+
+IInMesh (ORSModel.ors.Mesh) –
+
+Returns:
+output (ORSModel.ors.Mesh) –
+
+getAsGraph(self, optionalInputGraph: ORSModel.ors.Graph, IProgress: ORSModel.ors.Progress) → ORSModel.ors.Graph
+Computes the graph of theMultiROI’s connectivity.
+
+Parameters:
+optionalInputGraph (ORSModel.ors.Graph) – an optional input graph to modify (a Graph)
+
+IProgress (ORSModel.ors.Progress) – a progress object (a Progress)
+
+Returns:
+output (ORSModel.ors.Graph) – graph of the MultiROI’s connectivity
+
+getAsMarchingCubesMesh(self, isovalue: float, bSnapToContour: bool, flipNormal: bool, timeStep: int, xSample: int, ySample: int, zSample: int, pNearest: bool, pWorld: bool, IProgress: ORSModel.ors.Progress, pMesh: ORSModel.ors.Mesh) → ORSModel.ors.Mesh
+Parameters:
+isovalue (float) –
+
+bSnapToContour (bool) –
+
+flipNormal (bool) –
+
+timeStep (int) –
+
+xSample (int) –
+
+ySample (int) –
+
+zSample (int) –
+
+pNearest (bool) –
+
+pWorld (bool) –
+
+IProgress (ORSModel.ors.Progress) –
+
+pMesh (ORSModel.ors.Mesh) –
+
+Returns:
+output (ORSModel.ors.Mesh) –
+
+getAsNDArray(timestep=0)
+Get a numpy nd array representation
+
+Parameters:
+timestep (int) – timestep to extract
+
+getBoundingBoxOfLabel(self, pTIndex: int, iLabel: int) → ORSModel.ors.Box
+Parameters:
+pTIndex (int) –
+
+iLabel (int) –
+
+Returns:
+output (ORSModel.ors.Box) –
+
+getClassNameStatic() → str
+getClassNameStatic
+
+Returns:
+output (str) –
+
+getClipBox(timestep=0, display=None)
+Gets the clip box of the ROI or of the MultiROI
+
+Parameters:
+timestep (int) – the time index
+
+display (ORSModel.ors.View) – a view
+
+Returns:
+aClipBox (ORSModel.ors.Box) – the clip box
+
+getClipping(timestep=0, display=None)
+Gets the origin and the opposite summit of the clip box of the ROI or MultiROI
+
+Parameters:
+timestep (int) – the time index
+
+display (ORSModel.ors.View) – a view
+
+Returns:
+clipOriginSummit (ORSModel.ors.Vector3) – the origin summit of the clip box
+
+clipOppositeSummit (ORSModel.ors.Vector3) – the origin opposite summit of the clip box
+
+getClosedWithKernel(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are closed, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to close (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getClosedWithKernelOnSpecificSlices(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, axis: int, indices: ORSModel.ors.SequenceableCollection, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are closed, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to close (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+axis (int) – the axis of the specified slices (x=0,y=1,z=2) (a uint8_t)
+
+indices (ORSModel.ors.SequenceableCollection) – the slices to work on (an SequenceableCollection)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getColorSlot(self) → int
+Get the color slot index.
+
+Returns:
+output (int) –
+
+getConvexHullAsAFilledMultiROI(binning=1)
+Return the convex hull of a MultiROI as a filled MultiROI
+
+Parameters:
+binning (int) – the binning of the operation
+
+Returns:
+newMultiROI (ORSModel.ors.MultiROI) – the created MultiROI
+
+getConvexHullMeshSurfaces(tIndex, progress=None, binning=1)
+Creates a new Array Double of surface from convexHull of labels
+
+Parameters:
+self (ORSModel.ors.MultiROI) – the source MultiROI
+
+tIndex (int) – the time index of intersest
+
+progress (ORSModel.ors.Progress) – a progress object
+
+binning (int) – the binning of the operation
+
+Returns:
+newArrayDouble (ORSModel.ors.ArrayDouble) – the created ArrayDouble
+
+getCorrelatedWithKernel(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, threshold: float, pTimeStep: int, pROIMask: ORSModel.ors.ROI, progress: ORSModel.ors.Progress, pOutput: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Correlates theMultiROI (see note below) with a supplied 3D kernel.
+
+Note This method can be used to smooth the MultiROI by providing a smoothing kernel (e.g. with a gaussian distribution).
+Note Only those labels specified are correlated, in the order they are supplied in.
+Note If a mask is provided, its T size should be 1.
+Note All voxels (partipating in the labels specified) of the input MultiROI not in the mask are copied into the output MultiROI.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (an ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to correlate (an ArrayUnsignedLong)
+
+threshold (float) – the threshold value (a double). The output MultiROI will contain this voxel if the result of the correlation at that voxel is greater than or equal to this threshold value.
+
+pTimeStep (int) – the time step of the receiver MultiROI to smooth (a uint32_t)
+
+pROIMask (ORSModel.ors.ROI) – an optional mask (a ROI)
+
+progress (ORSModel.ors.Progress) – an optional progress object (a Progress)
+
+pOutput (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getDilatedWithKernel(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, progress: ORSModel.ors.Progress, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are dilated, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to dilate (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+progress (ORSModel.ors.Progress) – an optional progress object (a Progress)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getDilatedWithKernelOnSpecificSlices(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, axis: int, indices: ORSModel.ors.SequenceableCollection, progress: ORSModel.ors.Progress, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are dilated, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to dilate (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+axis (int) – the axis of the specified slices (x=0,y=1,z=2) (a uint8_t)
+
+indices (ORSModel.ors.SequenceableCollection) – the slices to work on (an SequenceableCollection)
+
+progress (ORSModel.ors.Progress) – an optional progress object (a Progress)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getErodedWithKernel(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, progress: ORSModel.ors.Progress, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are eroded, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to erode (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+progress (ORSModel.ors.Progress) – an optional progress object (a Progress)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getErodedWithKernelOnSpecificSlices(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, axis: int, indices: ORSModel.ors.SequenceableCollection, progress: ORSModel.ors.Progress, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are eroded, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to erode (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+axis (int) – the axis of the specified slices (x=0,y=1,z=2) (a uint8_t)
+
+indices (ORSModel.ors.SequenceableCollection) – the slices to work on (an SequenceableCollection)
+
+progress (ORSModel.ors.Progress) – an optional progress object (a Progress)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getFeretBox(iTIndex, iAngleSampling=5)
+Gets Feret box of a MultiROI
+
+Note Default value for angle sampling is 5
+Parameters:
+iTIndex (int) – the T index
+
+iAngleSampling (int) – the angle sampling, steps between each angle iteration
+
+Returns:
+output (ORSModel.ors.Box) – Feret box
+
+getIntersectionWithLabeledMultiROI(self, pInputLabeledMultiROI: ORSModel.ors.MultiROI, anOutputLabeledMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Intersects theMultiROI with another MultiROI.
+
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pInputLabeledMultiROI (ORSModel.ors.MultiROI) – the MultiROI to intersect with (a MultiROI)
+
+anOutputLabeledMultiROI (ORSModel.ors.MultiROI) – the output MultiROI (a MultiROI), see note below
+
+Returns:
+output (ORSModel.ors.MultiROI) – the intersection result
+
+getIntersectionWithROI(self, aROI: ORSModel.ors.ROI, anOutputMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Intersects theMultiROI with a ROI.
+
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+aROI (ORSModel.ors.ROI) – the ROI to intersect with (an ROI)
+
+anOutputMultiROI (ORSModel.ors.MultiROI) – the output MultiROI (a MultiROI), see note below
+
+Returns:
+output (ORSModel.ors.MultiROI) – the intersection result
+
+getIsClipped(timestep=0, display=None)
+Gets to know if there is a clip box attached to the ROI or MultiROI
+
+Parameters:
+timestep (int) – the time index
+
+display (ORSModel.ors.View) – a view
+
+Returns:
+isClipped (bool) – if True, the clip box of the ROI or MultiROI is visible; False otherwise.
+
+getLabelAtIndex(self, pIndex: int) → int
+Gets the label value at a given index.
+
+Note If no label exists at the given index 0 is returned.
+See also ORSModel.ors.MultiROIAbstract.getLabelAtPosition()
+Parameters:
+pIndex (int) – the index (a int64_t)
+
+Returns:
+output (int) – the resulting label (a uint32_t)
+
+getLabelColor(self, label: int) → ORSModel.ors.Color
+Gets the label color (See note below)
+
+Note Labels have two colors: the label color and the color of the current scalar.
+Parameters:
+label (int) – The label (a uint32_t)
+
+Returns:
+output (ORSModel.ors.Color) – a color (an ORS::Color)
+
+getLabelCount(self) → int
+Gets the number of distinct labels within.
+
+See also ORSModel.ors.MultiROI.getLabelSize(), ORSModel.ors.MultiROI.getNonEmptyLabelCount()
+Returns:
+output (int) – the number of labels (a uint32_t)
+
+getLabelScalarValuesCollection(self) → ORSModel.ors.ScalarValuesCollection
+Queries the scalar values collection of the labels.
+
+Returns:
+output (ORSModel.ors.ScalarValuesCollection) – the ScalarValuesCollection of the labels.
+
+getLabelSize(self, pLabel: int) → int
+Gets the size of a given label.
+
+See also ORSModel.ors.MultiROI.getLabelCount(), ORSModel.ors.MultiROI.getTotalVoxelCount()
+Parameters:
+pLabel (int) – the label value (a uint32_t)
+
+Returns:
+output (int) – the size of the label (a uint64_t)
+
+getLabelSizes(self, pLabelArray: ORSModel.ors.ArrayLONGLONG)
+Parameters:
+pLabelArray (ORSModel.ors.ArrayLONGLONG) –
+
+getLockedLabel(self, label: int) → bool
+Returns a bool to know if a label is locked.
+
+Parameters:
+label (int) – a Label (uint32_t)
+
+Returns:
+output (bool) – A bool (true if locked, false if unlocked)
+
+getLockedLabels(self) → ORSModel.ors.ArrayUnsignedLong
+Returns the Locked Labels.
+
+Returns:
+output (ORSModel.ors.ArrayUnsignedLong) – An array of labels
+
+getMergedLabelsIntersectingMultiROI(self, pInputMROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Parameters:
+pInputMROI (ORSModel.ors.MultiROI) –
+
+Returns:
+output (ORSModel.ors.MultiROI) –
+
+getMergedLabelsIntersectingROI(self, inputROI: ORSModel.ors.ROI) → ORSModel.ors.MultiROI
+Parameters:
+inputROI (ORSModel.ors.ROI) –
+
+Returns:
+output (ORSModel.ors.MultiROI) –
+
+getMergedWith(self, otherMultiROI: ORSModel.ors.MultiROI, outputMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Merges with the suppliedMultiROI.
+
+Note All the labels from the merge MultiROI are added to the receiver. If a label exists in the receiver then the two labels are merged, if not then the label is added.
+Parameters:
+otherMultiROI (ORSModel.ors.MultiROI) – the multiROI to merge with (a MultiROI)
+
+outputMultiROI (ORSModel.ors.MultiROI) – an output multiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) –
+
+getMinimalBox(self, iTIndex: int) → Box
+Get miminal box (also know as Oriented BoundingBox in litterature)
+
+Parameters:
+iTIndex (int) – the T index (a uint32_t)
+
+Returns:
+output (Box) –
+
+getNDArray(timestep=0)
+Get a numpy nd array representation
+
+Parameters:
+timestep (int) – timestep to analyse
+
+Deprecated since version 2021.1: use getAsNDArray instead
+
+getNonEmptyLabelCount(self) → int
+Gets the number of distinct labels within.
+
+See also ORSModel.ors.MultiROI.getLabelCount()
+Returns:
+output (int) – the number of non empty labels (a uint32_t)
+
+getNonEmptyLabels(self, pOutputArray: ORSModel.ors.ArrayUnsignedLong) → ORSModel.ors.ArrayUnsignedLong
+Returns an array of all non empty labels.
+
+Note If an output array is supplied, data is written to it and returned, otherwise a new array is created.
+Note The array is cleared prior to adding.
+Parameters:
+pOutputArray (ORSModel.ors.ArrayUnsignedLong) – an optional output array (an ArrayUnsignedLong)
+
+Returns:
+output (ORSModel.ors.ArrayUnsignedLong) – the resulting array (an ArrayUnsignedLong)
+
+getOpenWithKernel(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are open, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to open (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getOpenWithKernelOnSpecificSlices(self, pKernel: ORSModel.ors.ConvolutionKernel, labels: ORSModel.ors.ArrayUnsignedLong, pTimeStep: int, axis: int, indices: ORSModel.ors.SequenceableCollection, pOutMultiROI: ORSModel.ors.MultiROI) → ORSModel.ors.MultiROI
+Note Only those labels specified are open, in the order they are supplied in.
+Note The 3D kernel needs not be symmetric, but each dimension must be odd, for the center always represents the current voxel.
+Note If a target MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Parameters:
+pKernel (ORSModel.ors.ConvolutionKernel) – the kernel (a ConvolutionKernel)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels to open (an ArrayUnsignedLong)
+
+pTimeStep (int) – the time step (a uint32_t)
+
+axis (int) – the axis of the specified slices (x=0,y=1,z=2) (a uint8_t)
+
+indices (ORSModel.ors.SequenceableCollection) – the slices to work on (an SequenceableCollection)
+
+pOutMultiROI (ORSModel.ors.MultiROI) – an optional output MultiROI (a MultiROI)
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (a MultiROI)
+
+getProjectionIn(self, aLabeledMultiROI: ORSModel.ors.MultiROI, sourceTimeOffset: int, pProgress: ORSModel.ors.Progress) → ORSModel.ors.MultiROI
+Parameters:
+aLabeledMultiROI (ORSModel.ors.MultiROI) –
+
+sourceTimeOffset (int) –
+
+pProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.MultiROI) –
+
+getScalarSlotAsChannel(self, scalarSlot: int) → ORSModel.ors.Channel
+Extracts the labels and adds them all to a channel.
+
+Note If an output channel is supplied, data is written to it and returned, otherwise a new channel is created.
+See also asROI()
+Parameters:
+scalarSlot (int) – a scalar slot (a uint32_t)
+
+Returns:
+output (ORSModel.ors.Channel) – the resulting channel (an Channel)
+
+getSliceAsNDArray(sliceIndex: int = 0, timestep: int = 0)
+Get a numpy nd array representation
+
+Parameters:
+sliceIndex (int) – slice to extract
+
+timestep (int) – timestep to extract
+
+getSumOfSizesOfSelectedLabels(self) → int
+Gets the total size of all selected labels.
+
+See also ORSModel.ors.MultiROI.getLabelSize(), ORSModel.ors.MultiROI.getVoxelCount(), ORSModel.ors.MultiROI.getTotalVoxelCount()
+Returns:
+output (int) – the sum of all selected labels sizes (a uint64_t)
+
+getTotalVoxelCount(self) → int
+Gets the total size of all labels.
+
+See also ORSModel.ors.MultiROI.getLabelSize(), ORSModel.ors.MultiROI.getVoxelCount()
+Returns:
+output (int) – the total size (a uint64_t)
+
+getUnlabeledVoxelCount(self) → int
+Gets the count of unlabeled voxels.
+
+Note This number is the total size of the receiver (X*Y*Z*T) less the total size of all labeled voxels.
+See also ORSModel.ors.MultiROI.getLabelSize(), ORSModel.ors.MultiROI.getTotalVoxelCount()
+Returns:
+output (int) – the count of unlabeled voxels (a uint64_t)
+
+getVoxelCount(self, iTIndex: int) → int
+Gets the size of all labels for a given T value.
+
+See also ORSModel.ors.MultiROI.getLabelSize(), ORSModel.ors.MultiROI.getTotalVoxelCount()
+Parameters:
+iTIndex (int) –
+
+Returns:
+output (int) – the number of voxels in the MultiROI (an uint64_t)
+
+grid(self, celXSize: int, celYSize: int, celZSize: int, minT: int, maxT: int)
+Parameters:
+celXSize (int) –
+
+celYSize (int) –
+
+celZSize (int) –
+
+minT (int) –
+
+maxT (int) –
+
+classmethod imread(files)
+Loads a MultiROI from files
+
+Parameters:
+files (file) [count=[0, None]] – fully qualified file name list
+
+Returns:
+outMultiROI (ORSModel.ors.MultiROI) – the resulting MultiROI
+
+classmethod imreadDICOM(files)
+Loads a MultiROI from files or folder contaning DICOM
+
+Parameters:
+files (file) [count=[0, None]] – fully qualified file name list
+
+Returns:
+outMultiROI (ORSModel.ors.MultiROI) – the resulting MultiROI
+
+classmethod imreadDICOMFolder(folder)
+Loads a MultiROI from folder of DICOM files
+
+Parameters:
+folder (folder) – fully qualified folder
+
+Returns:
+outMultiROI (ORSModel.ors.MultiROI) – the resulting MultiROI
+
+classmethod imreadFolder(folder)
+Loads a MultiROI from folder
+
+Parameters:
+folder (folder) – fully qualified folder
+
+Returns:
+outMultiROI (ORSModel.ors.MultiROI) – the resulting MultiROI
+
+imsave(fileName)
+Save a MultiROI to file in the type specified by the extension
+
+Parameters:
+fileName (file saving) – fully qualified file name
+
+Return:
+True or False
+
+Rtype:
+bool
+
+imwrite(fileName)
+Save a MultiROI to file in the type specified by the extension
+
+Parameters:
+fileName (file saving) – fully qualified file name
+
+Return:
+True or False
+
+Rtype:
+bool
+
+insertLabeledMultiROI(self, pLabeledMultiROI: ORSModel.ors.MultiROI, insertionLabel: int) → bool
+Insert all the labels of aMultiROI starting at an insertion label.
+
+Parameters:
+pLabeledMultiROI (ORSModel.ors.MultiROI) – the MultiROI to insert (a MultiROI)
+
+insertionLabel (int) – the label at which the insertion begins (a uint32_t)
+
+Returns:
+output (bool) – true if the operation succeeded, false otherwise
+
+mergeLabels(self, targetLabel: int, sourceLabel: int) → bool
+Merge a label into another one.
+
+Parameters:
+targetLabel (int) – the receiving label (a uint32_t)
+
+sourceLabel (int) – the source label (a uint32_t)
+
+Returns:
+output (bool) – true if the operation succeeded, false otherwise
+
+MultiROI.mergeLabels(self, targetLabel: int, sourceLabels: ORSModel.ors.ArrayUnsignedLong) -> bool
+
+Merge several labels into another one.
+
+Parameters:
+targetLabel (int) – the target label (a uint32_t)
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) – the source labels (an ArrayUnsignedLong)
+
+Returns:
+output (bool) – true if the operation succeeded, false otherwise
+
+mergeLabelsIntersectingMultiROI(self, pInputMROI: ORSModel.ors.MultiROI) → bool
+Parameters:
+pInputMROI (ORSModel.ors.MultiROI) –
+
+Returns:
+output (bool) – return true if labels where collapse
+
+mergeLabelsIntersectingROI(self, pInputROI: ORSModel.ors.ROI) → bool
+assign the label of all intersecting labels to the smallest label intersecting
+
+Parameters:
+pInputROI (ORSModel.ors.ROI) –
+
+Returns:
+output (bool) – return true if labels where collapse
+
+none() → MultiROI
+Returns a none object, equivalent to a non-existent object (or null).
+
+Returns:
+output (MultiROI) –
+
+paintBoxConstrained(self, pBox: ORSModel.ors.Box, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, tStep: int)
+Parameters:
+pBox (ORSModel.ors.Box) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+tStep (int) –
+
+paintBoxConstrainedIfInRange(self, pBox: ORSModel.ors.Box, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, tStep: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+pBox (ORSModel.ors.Box) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+tStep (int) –
+
+fMinValue (float) –
+
+fMaxValue (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintCircleConstrainedOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, timeIndex: int)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+radius (float) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+timeIndex (int) –
+
+paintCircleConstrainedOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, timeIndex: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+radius (float) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+timeIndex (int) –
+
+fMinValue (float) –
+
+fMaxValue (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintRemoveBox(self, pBox: ORSModel.ors.Box, label: float, addLabel: float, tStep: int)
+Removes a box (3D object) from the receiver.
+
+Parameters:
+pBox (ORSModel.ors.Box) – The box (a Box)
+
+label (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label to add removed voxels to (or 0 to just remove voxels and not add them to any label)
+
+tStep (int) – The T index (a uint32_t)
+
+paintRemoveBoxIfInRange(self, pBox: ORSModel.ors.Box, eraseLabel: float, addLabel: float, tStep: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Removes a box (3D object) from the receiver if the data within the box is in the supplied range.
+
+Parameters:
+pBox (ORSModel.ors.Box) – The box (a Box)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label to add removed voxels to (or 0 to just remove voxels and not add them to any label)
+
+tStep (int) – The T index (a uint32_t)
+
+fMinValue (float) – The range lower bound (a double)
+
+fMaxValue (float) – The range upper bound (a double)
+
+pRangeChannel (ORSModel.ors.StructuredGrid) – The dataset where to check (a StructuredGrid)
+
+paintRemoveBoxIntersectingChannel(self, pBox: ORSModel.ors.Box, eraseLabel: float, addLabel: float, tStep: int, intersectingChannel: ORSModel.ors.Channel, levelingMinRange: float, levelingMaxRange: float, pLUT: ORSModel.ors.LookupTable, intersectingChannelClipBox: ORSModel.ors.Box)
+Removes a box (3D object) from the receiver if the box intersects with the supplied channel.
+
+Parameters:
+pBox (ORSModel.ors.Box) – The brush box (a Box)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+tStep (int) – The T index (a uint32_t)
+
+intersectingChannel (ORSModel.ors.Channel) – The intersecting channel (a Channel)
+
+levelingMinRange (float) – The window leveling lower bound (a double)
+
+levelingMaxRange (float) – The window leveling upper bound(a double)
+
+pLUT (ORSModel.ors.LookupTable) – The look up table (a LUT)
+
+intersectingChannelClipBox (ORSModel.ors.Box) – The channel box (a Box)
+
+paintRemoveBoxIntersectingMultiROI(self, pBox: ORSModel.ors.Box, eraseLabel: float, addLabel: float, tStep: int, intersectingMultiROI: ORSModel.ors.MultiROI, fHightlightOpacity: float, fHightlightOpacityOutRange: float, intersectingMultiROIClipBox: ORSModel.ors.Box)
+Removes a box (3D object) from the receiver if the sphere intersects with the suppliedMultiROI.
+
+Parameters:
+pBox (ORSModel.ors.Box) – The brush box (a Box)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+tStep (int) – The T index (a uint32_t)
+
+intersectingMultiROI (ORSModel.ors.MultiROI) – The intersecting MultiROI (a MultiROI)
+
+fHightlightOpacity (float) – The highlight opacity (a double)
+
+fHightlightOpacityOutRange (float) – The highlight opacity range (a double)
+
+intersectingMultiROIClipBox (ORSModel.ors.Box) – The MultiROI clip box (a Box)
+
+paintRemoveBoxIntersectingROI(self, pBox: ORSModel.ors.Box, eraseLabel: float, addLabel: float, tStep: int, intersectingROI: ORSModel.ors.ROI, intersectingROIClipBox: ORSModel.ors.Box)
+Removes a box (3D object) from the receiver if the sphere intersects with the suppliedROI.
+
+Parameters:
+pBox (ORSModel.ors.Box) – The brush box (a Box)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+tStep (int) – The T index (a uint32_t)
+
+intersectingROI (ORSModel.ors.ROI) – The intersecting ROI (a ROI)
+
+intersectingROIClipBox (ORSModel.ors.Box) – The ROI clip box (a Box)
+
+paintRemoveCircleOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, label: float, addLabel: float, timeIndex: int)
+Removes a circle (2D object) from the receiver.
+
+Parameters:
+pPlane (ORSModel.ors.Rectangle) – The plane of the circle (a Rectangle)
+
+worldPos (ORSModel.ors.Vector3) – The center of the circle (a Vector3)
+
+radius (float) – The radius circle (a double)
+
+label (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+timeIndex (int) – The T index (a uint32_t)
+
+paintRemoveCircleOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, eraselabel: float, addLabel: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Removes a circle (2D object) from the receiver if the data within the circle is in the supplied range.
+
+Parameters:
+pPlane (ORSModel.ors.Rectangle) – The plane of the circle (a Rectangle)
+
+worldPos (ORSModel.ors.Vector3) – The center of the circle (a Vector3)
+
+radius (float) – The radius circle (a double)
+
+eraselabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+timeIndex (int) – The T index (a uint32_t)
+
+lowerThreshold (float) – The range lower bound (a double)
+
+upperThreshold (float) – The range upper bound (a double)
+
+pRangeChannel (ORSModel.ors.StructuredGrid) – The dataset where to check (a StructuredGrid)
+
+paintRemoveSphere(self, worldPos: ORSModel.ors.Vector3, fRadius: float, label: float, addLabel: float, tStep: int)
+Removes a sphere (3D object) from the receiver.
+
+Parameters:
+worldPos (ORSModel.ors.Vector3) – The center of the sphere (a Vector3)
+
+fRadius (float) – The sphere radius (a double)
+
+label (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label to add removed voxels to (or 0 to just remove voxels and not add them to any label)
+
+tStep (int) – The T index (a uint32_t)
+
+paintRemoveSphereIfInRange(self, worldPos: ORSModel.ors.Vector3, fRadius: float, eraseLabel: float, addLabel: float, tStep: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Removes a sphere (3D object) from the receiver if the data within the sphere is in the supplied range.
+
+Parameters:
+worldPos (ORSModel.ors.Vector3) – The center of the sphere (a Vector3)
+
+fRadius (float) – The sphere radius (a double)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+tStep (int) – The T index (a uint32_t)
+
+fMinValue (float) – The range lower bound (a double)
+
+fMaxValue (float) – The range upper bound (a double)
+
+pRangeChannel (ORSModel.ors.StructuredGrid) – The dataset where to check (a StructuredGrid)
+
+paintRemoveSphereIntersectingChannel(self, worldPos: ORSModel.ors.Vector3, fRadius: float, eraseLabel: float, addLabel: float, tStep: int, intersectingChannel: ORSModel.ors.Channel, levelingMinRange: float, levelingMaxRange: float, ILUT: ORSModel.ors.LookupTable, intersectingChannelClipBox: ORSModel.ors.Box)
+Removes a sphere (3D object) from the receiver if the sphere intersects with the supplied channel.
+
+Parameters:
+worldPos (ORSModel.ors.Vector3) – The center of the sphere (a Vector3)
+
+fRadius (float) – The sphere radius (a double)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+tStep (int) – The T index (a uint32_t)
+
+intersectingChannel (ORSModel.ors.Channel) – The intersecting channel (a Channel)
+
+levelingMinRange (float) – The window leveling lower bound (a double)
+
+levelingMaxRange (float) – The window leveling upper bound(a double)
+
+ILUT (ORSModel.ors.LookupTable) – The look up table (a LUT)
+
+intersectingChannelClipBox (ORSModel.ors.Box) – The channel box (a Box)
+
+paintRemoveSphereIntersectingMultiROI(self, worldPos: ORSModel.ors.Vector3, radius: float, eraseLabel: float, addLabel: float, tStep: int, intersectingMultiROI: ORSModel.ors.MultiROI, fHightlightOpacity: float, fHightlightOpacityOutRange: float, intersectingMultiROIClipBox: ORSModel.ors.Box)
+Removes a sphere (3D object) from the receiver if the sphere intersects with the suppliedMultiROI.
+
+Parameters:
+worldPos (ORSModel.ors.Vector3) – The center of the sphere (a Vector3)
+
+radius (float) – The sphere radius (a double)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+tStep (int) – The T index (a uint32_t)
+
+intersectingMultiROI (ORSModel.ors.MultiROI) – The intersecting MultiROI (a MultiROI)
+
+fHightlightOpacity (float) – The highlight opacity (a double)
+
+fHightlightOpacityOutRange (float) – The highlight opacity range (a double)
+
+intersectingMultiROIClipBox (ORSModel.ors.Box) – The MultiROI clip box (a Box)
+
+paintRemoveSphereIntersectingROI(self, worldPos: ORSModel.ors.Vector3, fRadius: float, eraseLabel: float, label: float, tStep: int, intersectingROI: ORSModel.ors.ROI, intersectingROIClipBox: ORSModel.ors.Box)
+Removes a sphere (3D object) from the receiver if the sphere intersects with the suppliedROI.
+
+Parameters:
+worldPos (ORSModel.ors.Vector3) – The center of the sphere (a Vector3)
+
+fRadius (float) – The sphere radius (a double)
+
+eraseLabel (float) – The label to remove from (or 0 to remove from any label)
+
+label (float) – The label where the removed voxels should be written (a double, see note)
+
+tStep (int) – The T index (a uint32_t)
+
+intersectingROI (ORSModel.ors.ROI) – The intersecting ROI (a ROI)
+
+intersectingROIClipBox (ORSModel.ors.Box) – The ROI clip box (a Box)
+
+paintRemoveSquareOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, label: float, addLabel: float, timeIndex: int)
+Removes a square (2D object) from the receiver.
+
+Parameters:
+pPlane (ORSModel.ors.Rectangle) – The plane of the square (a Rectangle)
+
+worldPos (ORSModel.ors.Vector3) – The center of the square (a Vector3)
+
+radius (float) – The radius (a double)
+
+label (float) – The label affected (a double)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+timeIndex (int) – The T index (a uint32_t)
+
+paintRemoveSquareOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, width: float, eraselabel: float, addLabel: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Removes a square (2D object) from the receiver if the data within the square is in the supplied range.
+
+Parameters:
+pPlane (ORSModel.ors.Rectangle) – The plane of the square (a Rectangle)
+
+worldPos (ORSModel.ors.Vector3) – The center of the square (a Vector3)
+
+width (float) – The square width (a double)
+
+eraselabel (float) – The label to remove from (or 0 to remove from any label)
+
+addLabel (float) – The label where the removed voxels should be written (a double, see note)
+
+timeIndex (int) – The T index (a uint32_t)
+
+lowerThreshold (float) – The range lower bound (a double)
+
+upperThreshold (float) – The range upper bound (a double)
+
+pRangeChannel (ORSModel.ors.StructuredGrid) – The dataset where to check (a StructuredGrid)
+
+paintSphereConstrained(self, worldPos: ORSModel.ors.Vector3, fRadius: float, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, tStep: int)
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+fRadius (float) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+tStep (int) –
+
+paintSphereConstrainedIfInRange(self, worldPos: ORSModel.ors.Vector3, fRadius: float, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, tStep: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+fRadius (float) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+tStep (int) –
+
+fMinValue (float) –
+
+fMaxValue (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintSquareConstrainedOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, width: float, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, timeIndex: int)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+width (float) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+timeIndex (int) –
+
+paintSquareConstrainedOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, width: float, destinationLabel: float, sourceLabels: ORSModel.ors.ArrayUnsignedLong, timeIndex: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+width (float) –
+
+destinationLabel (float) –
+
+sourceLabels (ORSModel.ors.ArrayUnsignedLong) –
+
+timeIndex (int) –
+
+fMinValue (float) –
+
+fMaxValue (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+projectInShape(self, aShape: ORSModel.ors.Shape3D, sourceTime: int, destinationMROI: ORSModel.ors.MultiROI, destinationTime: int) → ORSModel.ors.MultiROI
+Parameters:
+aShape (ORSModel.ors.Shape3D) –
+
+sourceTime (int) –
+
+destinationMROI (ORSModel.ors.MultiROI) –
+
+destinationTime (int) –
+
+Returns:
+output (ORSModel.ors.MultiROI) –
+
+removeEmptyLabelsAndRenumber(self)
+Removes all empty labels and renumber the remaining labels in the same order.
+
+removeFromVolumeROI(self, pOutputROI: ORSModel.ors.ROI, pLabel: int)
+Remove all the voxels associated to a label from a VolumeROI.
+
+See also ORSModel.ors.StructuredGrid.getAsROI(), ORSModel.ors.MultiROIAbstract.removeROI()
+Parameters:
+pOutputROI (ORSModel.ors.ROI) – the output Volume ROI (an ROI)
+
+pLabel (int) – the label to extract (a uint32_t)
+
+removeIndex(self, anIndex: int)
+Remove an Index from theMultiROI.
+
+Parameters:
+anIndex (int) – the index (a uint64_t)
+
+removeIndexInterval(self, anIndex0: int, anIndex1: int)
+Remove index interval from theMultiROI.
+
+Parameters:
+anIndex0 (int) – the index0 (a uint64_t)
+
+anIndex1 (int) – the index1 (a uint64_t)
+
+removeLabelAndRenumber(self, pLabel: int)
+Removes the specified label and renumber the remaining labels in the same order.
+
+Parameters:
+pLabel (int) – the label to remove (a uint32_t)
+
+removeLabelIntersectingROI(self, pInputROI: ORSModel.ors.ROI) → bool
+Remove label that are intersecting the givenROI.
+
+Parameters:
+pInputROI (ORSModel.ors.ROI) –
+
+Returns:
+output (bool) – return true if label where removed (a bool)
+
+removeLabelNotIntersectingROI(self, pInputROI: ORSModel.ors.ROI) → bool
+Remove label that are not intersecting the givenROI.
+
+Parameters:
+pInputROI (ORSModel.ors.ROI) –
+
+Returns:
+output (bool) – return true if label where removed (a bool)
+
+removeLabeledMultiROI(self, pInputLabeledMultiROI: ORSModel.ors.MultiROI)
+Removes aMultiROI.
+
+Parameters:
+pInputLabeledMultiROI (ORSModel.ors.MultiROI) – the MultiROI to remove (a MultiROI)
+
+removeLabelsAndRenumber(self, pLabelArray: ORSModel.ors.ArrayUnsignedLong)
+Removes the specified labels and renumber the remaining labels in the same order.
+
+Parameters:
+pLabelArray (ORSModel.ors.ArrayUnsignedLong) – an array of labels to remove (an ArrayUnsignedLong)
+
+removeShape3DIntersectingLabels(self, aShape: ORSModel.ors.Shape3D, labels: ORSModel.ors.ArrayUnsignedLong, destinationLabel: int, timestep: int)
+Removes the intersection of the supplied shape and the list of labels.
+
+Parameters:
+aShape (ORSModel.ors.Shape3D) – a shape (a Shape3D)
+
+labels (ORSModel.ors.ArrayUnsignedLong) – an array of labels
+
+destinationLabel (int) – the destination label of removed voxels (0 to just remove them) (a uint32_t)
+
+timestep (int) – the time step (a uint32_t)
+
+removeVolumeROIFromLabel(self, aLabel: int, pROI: ORSModel.ors.ROI, pTOffset: int = 0) → bool
+Parameters:
+aLabel (int) –
+
+pROI (ORSModel.ors.ROI) –
+
+pTOffset (int) –
+
+Returns:
+output (bool) –
+
+setColorSlot(self, colorSlot: int)
+Set the color slot index.
+
+Parameters:
+colorSlot (int) –
+
+setLabelCount(self, aCount: int)
+Sets the label count.
+
+Note Changing the label count preserves existing label data, unless you reduce the count, in which case the data subtracted is lost.
+Parameters:
+aCount (int) – the label count to set (a uint32_t)
+
+setLockedLabel(self, label: int, locked: bool)
+Lock or Unlock 1 Label.
+
+Parameters:
+label (int) – An array of labels
+
+locked (bool) – true to lock, false to unlock
+
+setLockedLabels(self, labels: ORSModel.ors.ArrayUnsignedLong, locked: bool)
+Lock or Unlock 1 or more Labels.
+
+Parameters:
+labels (ORSModel.ors.ArrayUnsignedLong) – An array of labels
+
+locked (bool) – true to lock, false to unlock
+
+sortAndRenumberLabelsOnSize(self, bAscending: bool, bRemoveEmptyLabels: bool)
+Sorts and renumbers the labels based on their sizes (number of labels).
+
+Parameters:
+bAscending (bool) – true to sort in ascending order, false to sort in descending order
+
+bRemoveEmptyLabels (bool) – true to remove empty labels, false to keep them
+
+swapLabels(self, label1: int, label2: int)
+Swaps two labels.
+
+Parameters:
+label1 (int) – the first label (a uint32_t)
+
+label2 (int) – the second label (a uint32_t)
+
+StructuredGrid
+class ORSModel.ors.StructuredGrid(self, buffer: bytes, nBytes: int, bPreserveIdentity: bool = False)
+Bases: Node
+
+Parameters:
+buffer (bytes) –
+
+nBytes (int) –
+
+bPreserveIdentity (bool) –
+
+addROIAtTOffset(self, aROI: ORSModel.ors.ROI, label: int, pTOffset: int)
+Note The ROI to add will be projected correctly if it doesn’t share the same characteristics.
+See also AddROI(), MergeWithROI()
+Parameters:
+aROI (ORSModel.ors.ROI) – the ROI to add (an ROI)
+
+label (int) – a label (a uint32_t)
+
+pTOffset (int) – the T offset (a uint32_t)
+
+copyShapeFromBox(self, pBox: ORSModel.ors.Box, tSize: int)
+Initializes the structured grid’s shape based on a box.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Parameters:
+pBox (ORSModel.ors.Box) – a box (a Box)
+
+tSize (int) – a T size (an uint32_t)
+
+copyShapeFromRectangle(self, pRectangle: ORSModel.ors.Rectangle, zSpacing: float, tSize: int)
+Initializes the structured grid’s shape based on a rectangle.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Parameters:
+pRectangle (ORSModel.ors.Rectangle) – a rectangle (a Rectangle)
+
+zSpacing (float) – the thickness of the output structured grid (a double)
+
+tSize (int) – a T size (an uint32_t)
+
+copyShapeFromStructuredGrid(self, pStructuredGrid: ORSModel.ors.StructuredGrid)
+Initializes the structured grid’s shape based on another structured grid.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Note Shape includes size, spacing, type, description, position and location.
+Note This method does not handle the structured grid’s data.
+Parameters:
+pStructuredGrid (ORSModel.ors.StructuredGrid) – a source structured grid
+
+getAsChannel(self, inOutStructuredGrid: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress) → ORSModel.ors.Channel
+Convert a structured grid to a channel.
+
+Note If an output channel is supplied, data is written to it and returned, otherwise a new channel is created.
+Note If the source structured grid is a channel it returns a copy.
+Note If the source structured grid is a Volume ROI the channel output data type is UNSIGNED CHAR. A value of 1 is written where a label exist in the input Volume ROI, 0 otherwise.
+Note If the source structured grid is a MultiROI the output data type is determined by the total number of labels within:
+See also ORSModel.ors.StructuredGrid.getAsROI(), ORSModel.ors.StructuredGrid.getAsMultiROI()
+Parameters:
+inOutStructuredGrid (ORSModel.ors.StructuredGrid) – an optional output channel (an StructuredGrid)
+
+IProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.Channel) – the resulting channel (an StructuredGrid)
+
+getAsMultiROI(self, inOutStructuredGrid: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress) → ORSModel.ors.MultiROI
+Convert a structured grid to aMultiROI.
+
+Note If an output MultiROI is supplied, data is written to it and returned, otherwise a new MultiROI is created.
+Note The MultiROI is cleared prior to adding.
+Note If the source structured grid is a channel the output MultiROI will contain a label for every non zero channel values.
+Note If the source structured grid is a Volume ROI it returns a MultiROI of 1 label.
+Note If the source structured grid is a MultiROI it returns a copy.
+See also addToROI(), removeROI(), ORSModel.ors.StructuredGrid.getAsChannel()
+Parameters:
+inOutStructuredGrid (ORSModel.ors.StructuredGrid) – an optional output MultiROI (an StructuredGrid)
+
+IProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.MultiROI) – the resulting MultiROI (an StructuredGrid)
+
+getAsROI(self, inOutStructuredGrid: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress) → ORSModel.ors.ROI
+Convert a structured grid to a VolumeROI.
+
+Note If an output ROI is supplied, data is written to it and returned, otherwise a new ROI is created.
+Note The ROI is cleared prior to adding.
+Note If the source structured grid is a channel the output Volume ROI will contain voxel for every non zero channel values.
+Note If the source structured grid is a Volume ROI it returns a copy.
+Note If the source structured grid is a MultiROI it extracts the labels and adds them all to a Volume ROI.
+See also addToROI(), removeROI(), ORSModel.ors.StructuredGrid.getAsChannel()
+Parameters:
+inOutStructuredGrid (ORSModel.ors.StructuredGrid) – an optional output Volume ROI (an StructuredGrid)
+
+IProgress (ORSModel.ors.Progress) – an optional progress object (a Progress)
+
+Returns:
+output (ORSModel.ors.ROI) – the resulting Volume ROI (an StructuredGrid)
+
+getBoundingBox(self, pTIndex: int) → ORSModel.ors.Box
+Parameters:
+pTIndex (int) –
+
+Returns:
+output (ORSModel.ors.Box) –
+
+getBox(self) → ORSModel.ors.Box
+Gets the box.
+
+Returns:
+output (ORSModel.ors.Box) – the box (an Box)
+
+getClassNameStatic() → str
+getClassNameStatic
+
+Returns:
+output (str) –
+
+getDirtyBox(self, bResetDirtyBox: bool) → ORSModel.ors.Box
+Gets the dirty box.
+
+Parameters:
+bResetDirtyBox (bool) – insicate that the dirty box should be resetted (a bool)
+
+Returns:
+output (ORSModel.ors.Box) – the dirty box (a Box)
+
+getHasNonZeroDataOnPlane(self, aPlane: ORSModel.ors.Plane, tStep: int) → bool
+Test to know if there is a non zero value on plain.
+
+Parameters:
+aPlane (ORSModel.ors.Plane) – a Plane (ORS::Plane)
+
+tStep (int) – a time step (uint32_t)
+
+Returns:
+output (bool) – a bool (bool)
+
+getHasNonZeroDataOnSlice(self, sliceIndex: int, timestep: int) → bool
+Parameters:
+sliceIndex (int) –
+
+timestep (int) –
+
+Returns:
+output (bool) –
+
+getHasSameShape(self, pStructuredGrid: ORSModel.ors.StructuredGrid) → bool
+Note Shape comparison includes axis sizes, spacing, position and orientation.
+Parameters:
+pStructuredGrid (ORSModel.ors.StructuredGrid) – a comparison structured grid
+
+Returns:
+output (bool) – true if the comparison structured grid has same shape as receiver structured grid, false otherwise
+
+getIndexOfFirstIntersectingNonZeroElement(self, aLine: ORSModel.ors.Line, subBox: ORSModel.ors.Box, timestep: int) → ORSModel.ors.Vector3
+Parameters:
+aLine (ORSModel.ors.Line) –
+
+subBox (ORSModel.ors.Box) –
+
+timestep (int) –
+
+Returns:
+output (ORSModel.ors.Vector3) –
+
+getLabelAtPosition(self, tIndex: int, worldPosition: ORSModel.ors.Vector3) → int
+Parameters:
+tIndex (int) –
+
+worldPosition (ORSModel.ors.Vector3) –
+
+Returns:
+output (int) –
+
+getOrigin(self) → ORSModel.ors.Vector3
+Returns:
+output (ORSModel.ors.Vector3) –
+
+getOriginalBox(self) → ORSModel.ors.Box
+Returns:
+output (ORSModel.ors.Box) –
+
+getPositionOfFirstIntersectingNonZeroElement(self, aLine: ORSModel.ors.Line, subBox: ORSModel.ors.Box, timestep: int) → ORSModel.ors.Vector3
+Parameters:
+aLine (ORSModel.ors.Line) –
+
+subBox (ORSModel.ors.Box) –
+
+timestep (int) –
+
+Returns:
+output (ORSModel.ors.Vector3) –
+
+getShape3DGrownToContain(self, aShape: ORSModel.ors.Shape3D, timeIndex: int) → ORSModel.ors.Shape3D
+Parameters:
+aShape (ORSModel.ors.Shape3D) –
+
+timeIndex (int) –
+
+Returns:
+output (ORSModel.ors.Shape3D) –
+
+getSliceAtIndex(self, zIndex: int, inStructuredGridSlice: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress) → ORSModel.ors.StructuredGrid
+Parameters:
+zIndex (int) –
+
+inStructuredGridSlice (ORSModel.ors.StructuredGrid) –
+
+IProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.StructuredGrid) –
+
+getSliceIntersectingBoundedPlane(self, aBoundedPlane: ORSModel.ors.Rectangle, inStructuredGridSlice: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress) → ORSModel.ors.StructuredGrid
+Parameters:
+aBoundedPlane (ORSModel.ors.Rectangle) –
+
+inStructuredGridSlice (ORSModel.ors.StructuredGrid) –
+
+IProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.StructuredGrid) –
+
+getSpaceHasBeenTransformed(self) → bool
+Returns:
+output (bool) –
+
+getSpacingInDirection(self, pDirection: ORSModel.ors.Vector3) → float
+Gets the spacing in the specified direction.
+
+Note A structured grid knows its X, Y and Z spacing but can compute the spacing in any direction with this method.
+See also ORSModel.ors.StructuredGrid.getXSpacing(), ORSModel.ors.StructuredGrid.getYSpacing(), ORSModel.ors.StructuredGrid.getZSpacing()
+Parameters:
+pDirection (ORSModel.ors.Vector3) – the direction vector (an Vector3)
+
+Returns:
+output (float) – The spacing (a double)
+
+getSubset(self, xmin: int, ymin: int, zmin: int, tmin: int, xmax: int, ymax: int, zmax: int, tmax: int, inChannelSubset: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress) → ORSModel.ors.StructuredGrid
+Note To prevent creating extra StructuredGrid, the output StructuredGrid can be fed as the second to last argument to the method.
+Note If an output structured grid is not supplied, a StructuredGrid of the same base type will be created, otherwise the data will be fed directly into it.
+Parameters:
+xmin (int) –
+
+ymin (int) –
+
+zmin (int) –
+
+tmin (int) –
+
+xmax (int) –
+
+ymax (int) –
+
+zmax (int) –
+
+tmax (int) –
+
+inChannelSubset (ORSModel.ors.StructuredGrid) –
+
+IProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.StructuredGrid) – a StructuredGrid (see notes)
+
+getSubsetFromBox(self, subBox: ORSModel.ors.Box, timeIndex: int, inSGSubset: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress) → ORSModel.ors.StructuredGrid
+Note To prevent creating extra StructuredGrid, the output StructuredGrid can be fed as the second to last argument to the method.
+Note If an output structured grid is not supplied, a StructuredGrid of the same base type will be created, otherwise the data will be fed directly into it.
+Parameters:
+subBox (ORSModel.ors.Box) –
+
+timeIndex (int) –
+
+inSGSubset (ORSModel.ors.StructuredGrid) –
+
+IProgress (ORSModel.ors.Progress) –
+
+Returns:
+output (ORSModel.ors.StructuredGrid) – a StructuredGrid (see notes)
+
+getTSize(self) → int
+Gets the T size of the structured grid.
+
+Note The T size is expressed in units.
+See also ORSModel.ors.StructuredGrid.setTSize(), ORSModel.ors.StructuredGrid.getTSpacing()
+Returns:
+output (int) – the T size (an uint32_t)
+
+getTSpacing(self) → float
+Gets the structured grid’s T spacing.
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.setTSpacing()
+Returns:
+output (float) – T spacing (a double)
+
+getTransformationFromOriginalReferential(self) → ORSModel.ors.Matrix4x4
+Returns:
+output (ORSModel.ors.Matrix4x4) –
+
+getTransformationShape3D(self) → ORSModel.ors.Shape3D
+Returns:
+output (ORSModel.ors.Shape3D) –
+
+getValueAlongPrimitivePath(self, aPath: ORSModel.ors.VisualPath, nbPoint: int, timestep: int, values: ORSModel.ors.ArrayDouble, samplingPointsX: ORSModel.ors.ArrayDouble, samplingPointsY: ORSModel.ors.ArrayDouble, samplingPointsZ: ORSModel.ors.ArrayDouble)
+Parameters:
+aPath (ORSModel.ors.VisualPath) –
+
+nbPoint (int) –
+
+timestep (int) –
+
+values (ORSModel.ors.ArrayDouble) –
+
+samplingPointsX (ORSModel.ors.ArrayDouble) –
+
+samplingPointsY (ORSModel.ors.ArrayDouble) –
+
+samplingPointsZ (ORSModel.ors.ArrayDouble) –
+
+getValueAlongPrimitiveRuler(self, aRuler: ORSModel.ors.VisualRuler, nbPoint: int, timestep: int, values: ORSModel.ors.ArrayDouble, samplingPointsX: ORSModel.ors.ArrayDouble, samplingPointsY: ORSModel.ors.ArrayDouble, samplingPointsZ: ORSModel.ors.ArrayDouble)
+Parameters:
+aRuler (ORSModel.ors.VisualRuler) –
+
+nbPoint (int) –
+
+timestep (int) –
+
+values (ORSModel.ors.ArrayDouble) –
+
+samplingPointsX (ORSModel.ors.ArrayDouble) –
+
+samplingPointsY (ORSModel.ors.ArrayDouble) –
+
+samplingPointsZ (ORSModel.ors.ArrayDouble) –
+
+getValueAtPosition(self, worldPos: ORSModel.ors.Vector3, timestep: int, defaultValue: float = None) → float
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+timestep (int) –
+
+defaultValue (float) –
+
+Returns:
+output (float) –
+
+getVoxelToWorldCoordinates(self, anIndex: ORSModel.ors.Vector3) → ORSModel.ors.Vector3
+Parameters:
+anIndex (ORSModel.ors.Vector3) –
+
+Returns:
+output (ORSModel.ors.Vector3) –
+
+getWorldToVoxelCoordinates(self, pPointInWorld: ORSModel.ors.Vector3) → ORSModel.ors.Vector3
+Gets a given voxel’s index from world coordinates.
+
+Parameters:
+pPointInWorld (ORSModel.ors.Vector3) – the voxel coordinate encoded in ORS::Vector3
+
+Returns:
+output (ORSModel.ors.Vector3) – the voxel coordinates (in a vector) of the voxel (an Vector3)
+
+getXSize(self) → int
+Gets the X size of the structured grid.
+
+Note The size is expressed in pixels.
+See also ORSModel.ors.StructuredGrid.setXSize(), ORSModel.ors.StructuredGrid.getXSpacing()
+Returns:
+output (int) – the X size (an uint32_t)
+
+getXSpacing(self) → float
+Gets the structured grid’s X spacing.
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.setXSpacing()
+Returns:
+output (float) – X spacing (a double)
+
+getYSize(self) → int
+Gets the Y size of the structured grid.
+
+Note The size is expressed in pixels.
+See also ORSModel.ors.StructuredGrid.setYSize(), ORSModel.ors.StructuredGrid.getYSpacing()
+Returns:
+output (int) – the Y size (an uint32_t)
+
+getYSpacing(self) → float
+Gets the structured grid’s Y spacing.
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.setYSpacing()
+Returns:
+output (float) – Y spacing (a double)
+
+getZSize(self) → int
+Gets the Z size of the structured grid.
+
+Note The size is expressed in pixels.
+See also ORSModel.ors.StructuredGrid.setZSize(), ORSModel.ors.StructuredGrid.getZSpacing()
+Returns:
+output (int) – the Z size (an uint32_t)
+
+getZSliceThickness(self) → float
+Gets the structured grid’s Z slice thickness.
+
+Note Slice thickness is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.setZSpacing(), ORSModel.ors.StructuredGrid.getZSpacing(), ORSModel.ors.StructuredGrid.setZSliceThickness()
+Returns:
+output (float) – Z slice thickness (a double)
+
+getZSpacing(self) → float
+Gets the structured grid’s Z spacing.
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.setZSpacing()
+Returns:
+output (float) – Z spacing (a double)
+
+none() → StructuredGrid
+Returns a none object, equivalent to a non-existent object (or null).
+
+Returns:
+output (StructuredGrid) –
+
+paintBox(self, pBox: ORSModel.ors.Box, label: float, tStep: int)
+Parameters:
+pBox (ORSModel.ors.Box) –
+
+label (float) –
+
+tStep (int) –
+
+paintBoxIfInRange(self, pBox: ORSModel.ors.Box, label: float, tStep: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+pBox (ORSModel.ors.Box) –
+
+label (float) –
+
+tStep (int) –
+
+fMinValue (float) –
+
+fMaxValue (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintBoxIntersectingChannel(self, pBox: ORSModel.ors.Box, label: float, tStep: int, intersectingChannel: ORSModel.ors.Channel, levelingMinRange: float, levelingMaxRange: float, ILUT: ORSModel.ors.LookupTable, intersectingChannelClipBox: ORSModel.ors.Box)
+Parameters:
+pBox (ORSModel.ors.Box) –
+
+label (float) –
+
+tStep (int) –
+
+intersectingChannel (ORSModel.ors.Channel) –
+
+levelingMinRange (float) –
+
+levelingMaxRange (float) –
+
+ILUT (ORSModel.ors.LookupTable) –
+
+intersectingChannelClipBox (ORSModel.ors.Box) –
+
+paintBoxIntersectingMultiROI(self, pBox: ORSModel.ors.Box, label: float, tStep: int, intersectingMultiROI: ORSModel.ors.MultiROI, fHightlightOpacity: float, fHightlightOpacityOutRange: float, intersectingMultiROIClipBox: ORSModel.ors.Box)
+Parameters:
+pBox (ORSModel.ors.Box) –
+
+label (float) –
+
+tStep (int) –
+
+intersectingMultiROI (ORSModel.ors.MultiROI) –
+
+fHightlightOpacity (float) –
+
+fHightlightOpacityOutRange (float) –
+
+intersectingMultiROIClipBox (ORSModel.ors.Box) –
+
+paintBoxIntersectingROI(self, pBox: ORSModel.ors.Box, label: float, tStep: int, intersectingROI: ORSModel.ors.ROI, intersectingROIClipBox: ORSModel.ors.Box)
+Parameters:
+pBox (ORSModel.ors.Box) –
+
+label (float) –
+
+tStep (int) –
+
+intersectingROI (ORSModel.ors.ROI) –
+
+intersectingROIClipBox (ORSModel.ors.Box) –
+
+paintCircle(self, aCircle: ORSModel.ors.Circle, label: float, timeIndex: int)
+Parameters:
+aCircle (ORSModel.ors.Circle) –
+
+label (float) –
+
+timeIndex (int) –
+
+paintCircleOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, label: float, timeIndex: int)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+radius (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+paintCircleOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, label: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+radius (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+lowerThreshold (float) –
+
+upperThreshold (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintEllipseOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, dir0Radius: float, dir1Radius: float, axisOrientation: float, label: float, timeIndex: int, worldPositionArray: ORSModel.ors.ArrayDouble)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+dir0Radius (float) –
+
+dir1Radius (float) –
+
+axisOrientation (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+worldPositionArray (ORSModel.ors.ArrayDouble) –
+
+paintEllipseOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, dir0Radius: float, dir1Radius: float, axisOrientation: float, label: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid, worldPositionArray: ORSModel.ors.ArrayDouble)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+dir0Radius (float) –
+
+dir1Radius (float) –
+
+axisOrientation (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+lowerThreshold (float) –
+
+upperThreshold (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+worldPositionArray (ORSModel.ors.ArrayDouble) –
+
+paintPolygonOnPlane(self, pPlane: ORSModel.ors.Rectangle, polygonWorldPos: ORSModel.ors.ArrayDouble, label: float, timeIndex: int, worldPositionArray: ORSModel.ors.ArrayDouble)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+polygonWorldPos (ORSModel.ors.ArrayDouble) –
+
+label (float) –
+
+timeIndex (int) –
+
+worldPositionArray (ORSModel.ors.ArrayDouble) –
+
+paintPolygonOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, polygonWorldPos: ORSModel.ors.ArrayDouble, label: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid, worldPositionArray: ORSModel.ors.ArrayDouble)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+polygonWorldPos (ORSModel.ors.ArrayDouble) –
+
+label (float) –
+
+timeIndex (int) –
+
+lowerThreshold (float) –
+
+upperThreshold (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+worldPositionArray (ORSModel.ors.ArrayDouble) –
+
+paintRectangleOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, dir0Length: float, dir1Length: float, label: float, timeIndex: int)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+dir0Length (float) –
+
+dir1Length (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+paintRectangleOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, dir0Length: float, dir1Length: float, label: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid, worldPositionArray: ORSModel.ors.ArrayDouble)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+dir0Length (float) –
+
+dir1Length (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+lowerThreshold (float) –
+
+upperThreshold (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+worldPositionArray (ORSModel.ors.ArrayDouble) –
+
+paintRemoveBox(self, pBox: ORSModel.ors.Box, tStep: int)
+Removes a box (3D object) from the receiver.
+
+Parameters:
+pBox (ORSModel.ors.Box) – The T index (a uint32_t)
+
+tStep (int) –
+
+paintRemoveCircleOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, timeIndex: int)
+Removes a circle (2D object) from the receiver.
+
+Parameters:
+pPlane (ORSModel.ors.Rectangle) – The plane of the circle (a Rectangle)
+
+worldPos (ORSModel.ors.Vector3) – The center of the circle (a Vector3)
+
+radius (float) – The radius of the circle (a double)
+
+timeIndex (int) – The T index (a uint32_t)
+
+paintRemoveSphere(self, worldPos: ORSModel.ors.Vector3, fRadius: float, tStep: int)
+Removes a sphere (3D object) from the receiver.
+
+Parameters:
+worldPos (ORSModel.ors.Vector3) – The center of the sphere (a Vector3)
+
+fRadius (float) – The sphere radius (a double)
+
+tStep (int) – The T index (a uint32_t)
+
+paintRemoveSquareOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, radius: float, timeIndex: int)
+Removes a square (2D object) from the receiver.
+
+Parameters:
+pPlane (ORSModel.ors.Rectangle) – The plane of the square (a Rectangle)
+
+worldPos (ORSModel.ors.Vector3) – The center of the square (a Vector3)
+
+radius (float) – The radius (a double)
+
+timeIndex (int) – The T index (a uint32_t)
+
+paintShape3D(self, aShape: ORSModel.ors.Shape3D, label: float, tStep: int)
+Parameters:
+aShape (ORSModel.ors.Shape3D) –
+
+label (float) –
+
+tStep (int) –
+
+paintShape3DIfInRange(self, aShape: ORSModel.ors.Shape3D, label: float, tStep: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+aShape (ORSModel.ors.Shape3D) –
+
+label (float) –
+
+tStep (int) –
+
+fMinValue (float) –
+
+fMaxValue (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintSphere(self, worldPos: ORSModel.ors.Vector3, fRadius: float, label: float, tStep: int)
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+fRadius (float) –
+
+label (float) –
+
+tStep (int) –
+
+paintSphereIfInRange(self, worldPos: ORSModel.ors.Vector3, fRadius: float, label: float, tStep: int, fMinValue: float, fMaxValue: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+fRadius (float) –
+
+label (float) –
+
+tStep (int) –
+
+fMinValue (float) –
+
+fMaxValue (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintSphereIntersectingChannel(self, worldPos: ORSModel.ors.Vector3, fRadius: float, label: float, tStep: int, intersectingChannel: ORSModel.ors.Channel, levelingMinRange: float, levelingMaxRange: float, ILUT: ORSModel.ors.LookupTable, intersectingChannelClipBox: ORSModel.ors.Box)
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+fRadius (float) –
+
+label (float) –
+
+tStep (int) –
+
+intersectingChannel (ORSModel.ors.Channel) –
+
+levelingMinRange (float) –
+
+levelingMaxRange (float) –
+
+ILUT (ORSModel.ors.LookupTable) –
+
+intersectingChannelClipBox (ORSModel.ors.Box) –
+
+paintSphereIntersectingMultiROI(self, worldPos: ORSModel.ors.Vector3, fRadius: float, label: float, tStep: int, intersectingMultiROI: ORSModel.ors.MultiROI, fHightlightOpacity: float, fHightlightOpacityOutRange: float, intersectingMultiROIClipBox: ORSModel.ors.Box)
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+fRadius (float) –
+
+label (float) –
+
+tStep (int) –
+
+intersectingMultiROI (ORSModel.ors.MultiROI) –
+
+fHightlightOpacity (float) –
+
+fHightlightOpacityOutRange (float) –
+
+intersectingMultiROIClipBox (ORSModel.ors.Box) –
+
+paintSphereIntersectingROI(self, worldPos: ORSModel.ors.Vector3, fRadius: float, label: float, tStep: int, intersectingROI: ORSModel.ors.ROI, intersectingROIClipBox: ORSModel.ors.Box)
+Parameters:
+worldPos (ORSModel.ors.Vector3) –
+
+fRadius (float) –
+
+label (float) –
+
+tStep (int) –
+
+intersectingROI (ORSModel.ors.ROI) –
+
+intersectingROIClipBox (ORSModel.ors.Box) –
+
+paintSquareOnPlane(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, width: float, label: float, timeIndex: int)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+width (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+paintSquareOnPlaneIfInRange(self, pPlane: ORSModel.ors.Rectangle, worldPos: ORSModel.ors.Vector3, width: float, label: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+pPlane (ORSModel.ors.Rectangle) –
+
+worldPos (ORSModel.ors.Vector3) –
+
+width (float) –
+
+label (float) –
+
+timeIndex (int) –
+
+lowerThreshold (float) –
+
+upperThreshold (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintSubset(self, startX: int, startY: int, startZ: int, endX: int, endY: int, endZ: int, label: float, tStep: int)
+Parameters:
+startX (int) –
+
+startY (int) –
+
+startZ (int) –
+
+endX (int) –
+
+endY (int) –
+
+endZ (int) –
+
+label (float) –
+
+tStep (int) –
+
+paintSubsetIfInRange(self, startX: int, startY: int, startZ: int, endX: int, endY: int, endZ: int, label: float, tStep: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+startX (int) –
+
+startY (int) –
+
+startZ (int) –
+
+endX (int) –
+
+endY (int) –
+
+endZ (int) –
+
+label (float) –
+
+tStep (int) –
+
+lowerThreshold (float) –
+
+upperThreshold (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+paintVoxelsFromWorldCoordinates(self, worldPositionArray: ORSModel.ors.ArrayDouble, label: float, timeIndex: int)
+Parameters:
+worldPositionArray (ORSModel.ors.ArrayDouble) –
+
+label (float) –
+
+timeIndex (int) –
+
+paintVoxelsFromWorldCoordinatesIfInRange(self, worldPositionArray: ORSModel.ors.ArrayDouble, label: float, timeIndex: int, lowerThreshold: float, upperThreshold: float, pRangeChannel: ORSModel.ors.StructuredGrid)
+Parameters:
+worldPositionArray (ORSModel.ors.ArrayDouble) –
+
+label (float) –
+
+timeIndex (int) –
+
+lowerThreshold (float) –
+
+upperThreshold (float) –
+
+pRangeChannel (ORSModel.ors.StructuredGrid) –
+
+projectInto(self, aDestinationStructuredGrid: ORSModel.ors.StructuredGrid, IProgress: ORSModel.ors.Progress)
+Copies the receiver into the destination, keeping the destination shape.
+
+Parameters:
+aDestinationStructuredGrid (ORSModel.ors.StructuredGrid) – a destination StructuredGrid (a StructuredGrid)
+
+IProgress (ORSModel.ors.Progress) –
+
+removeROIAtTOffset(self, aROI: ORSModel.ors.ROI, pTOffset: int)
+Note The ROI to add will be projected correctly if it doesn’t share the same characteristics.
+See also removeROI(), MergeWithROI()
+Parameters:
+aROI (ORSModel.ors.ROI) – the ROI to remove (an ROI)
+
+pTOffset (int) – the T offset (a uint32_t)
+
+setBox(self, IInBox: ORSModel.ors.Box)
+Sets the box.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Parameters:
+IInBox (ORSModel.ors.Box) – the box (an Box)
+
+setCurrentShapeAsOriginal(self)
+setOrigin(self, origin: ORSModel.ors.Vector3)
+Set the origin.
+
+Dirty flags: OrsGeometryDirty
+
+Parameters:
+origin (ORSModel.ors.Vector3) – the new origin (a Vector3)
+
+setTSize(self, pTSize: int)
+Sets the T size of the structured grid.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Note The T size is expressed in units.
+See also ORSModel.ors.StructuredGrid.getTSize()
+Parameters:
+pTSize (int) – T size (an uint32_t)
+
+setTSpacing(self, pTSpacing: float)
+Sets the structured grid’s T spacing.
+
+Dirty flags: OrsGeometryDirty
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.getTSpacing()
+Parameters:
+pTSpacing (float) – T spacing (a double)
+
+setTransformationShape3D(self, aShape: ORSModel.ors.Shape3D)
+Parameters:
+aShape (ORSModel.ors.Shape3D) –
+
+setXSize(self, pXSize: int)
+Sets the X size of the structured grid.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Note The size is expressed in pixels.
+See also ORSModel.ors.StructuredGrid.getXSize()
+Parameters:
+pXSize (int) – X size (an uint32_t)
+
+setXSpacing(self, pXSpacing: float)
+Sets the structured grid’s X spacing.
+
+Dirty flags: OrsGeometryDirty
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.getXSpacing()
+Parameters:
+pXSpacing (float) – X spacing (a double)
+
+setXYZTSize(self, pXSize: int, pYSize: int, pZSize: int, pTSize: int)
+Sets the X,Y,Z,T sizes of the structured grid.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Note The size is expressed in pixels.
+See also ORSModel.ors.StructuredGrid.getXSize()
+Parameters:
+pXSize (int) – X size (an uint32_t)
+
+pYSize (int) – Y size (an uint32_t)
+
+pZSize (int) – Z size (an uint32_t)
+
+pTSize (int) – T size (an uint32_t)
+
+setYSize(self, pYSize: int)
+Sets the Y size of the structured grid.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Note The size is expressed in pixels.
+See also ORSModel.ors.StructuredGrid.getYSize()
+Parameters:
+pYSize (int) – Y size (an uint32_t)
+
+setYSpacing(self, pYSpacing: float)
+Sets the structured grid’s Y spacing.
+
+Dirty flags: OrsGeometryDirty
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.getYSpacing()
+Parameters:
+pYSpacing (float) – Y spacing (a double)
+
+setZSize(self, pZSize: int)
+Sets the Z size of the structured grid.
+
+Dirty flags: OrsDataDirty, OrsGeometryDirty
+
+Note The size is expressed in pixels.
+See also ORSModel.ors.StructuredGrid.getZSize()
+Parameters:
+pZSize (int) – Z size (an uint32_t)
+
+setZSliceThickness(self, pZThickness: float)
+Sets the structured grid’s Z slice thickness.
+
+Note Slice thickness is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.setZSpacing(), ORSModel.ors.StructuredGrid.getZSpacing(), ORSModel.ors.StructuredGrid.getZSliceThickness()
+Parameters:
+pZThickness (float) – Z slice thickness (a double)
+
+setZSpacing(self, pZSpacing: float)
+Sets the structured grid’s Z spacing.
+
+Dirty flags: OrsGeometryDirty
+
+Note Spacing is used for structured grid visual representation.
+See also ORSModel.ors.StructuredGrid.getZSpacing()
+Parameters:
+pZSpacing (float) – Z spacing (a double)
+
+warpWithDeformationChannels(self, deformationChannelX: ORSModel.ors.Channel, deformationChannelY: ORSModel.ors.Channel, deformationChannelZ: ORSModel.ors.Channel, tIndex: int) → ORSModel.ors.StructuredGrid
+Parameters:
+deformationChannelX (ORSModel.ors.Channel) –
+
+deformationChannelY (ORSModel.ors.Channel) –
+
+deformationChannelZ (ORSModel.ors.Channel) –
+
+tIndex (int) –
+
+Returns:
+output (ORSModel.ors.StructuredGrid) –
+
+Node
+class ORSModel.ors.Node(*args, **kwargs)
+Bases: Managed
+
+An abstract class for any object that can be a node in the visualization flow.
+
+attachChild(self, anINode: ORSModel.ors.Node) → bool
+Attaches a child node.
+
+Note Certain parent-child relationships are forbidden, hence the need to verify the result.
+Note Calling this method several times will still result in the child node only appearing once in its parent.
+Parameters:
+anINode (ORSModel.ors.Node) – the node to attach (a Node)
+
+Returns:
+output (bool) – true if child was attached, false otherwise
+
+attachChildAtIndex(self, anINode: ORSModel.ors.Node, index: int) → bool
+Attaches a child node at a given index.
+
+Note Certain parent-child relationships are forbidden, hence the need to verify the result.
+Note Calling this method several times will still result in the child node only appearing once in its parent.
+Parameters:
+anINode (ORSModel.ors.Node) – the node to attach (a Node)
+
+index (int) – the index (a uint32_t)
+
+Returns:
+output (bool) – true if child was attached, false otherwise
+
+copyGraph(self) → ORSModel.ors.Node
+Returns a copy of the node, including its graph.
+
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Returns:
+output (ORSModel.ors.Node) – a new node (a Node)
+
+detachChild(self, anINode: ORSModel.ors.Node) → bool
+Detaches a child node.
+
+Parameters:
+anINode (ORSModel.ors.Node) – the node to detach (a Node)
+
+Returns:
+output (bool) – true if child was detached, false otherwise
+
+getAllChildrenNodes(self) → ORSModel.ors.List
+Returns a flattened list of the child hierarchy of the node.
+
+Note The child hierarchy is flattened.
+Note Expect a depth first search ordering of the nodes.
+See also ORSModel.ors.Node.getIsNodeOneOfMyDescendants()
+Returns:
+output (ORSModel.ors.List) – a list of all nodes below the node (a List)
+
+getAllChildrenOfClass(self, pProgId: str) → ORSModel.ors.List
+Returns all the nodes of the specified class found in the child hierarchy.
+
+Note Result will be an empty list if no match is found.
+Note The search is done depth-first.
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.List) – a list of nodes (a List)
+
+getAllChildrenOfClassReachableByRenderer(self, pProgId: str) → ORSModel.ors.List
+Returns a flattened list of all the child nodes, of the given class, that are renderable.
+
+Note The list contains only Managed objects (they will need to be typecast to the appropriate class).
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.List) – a list of all child nodes that can be rendered (an List)
+
+getAllParentNodes(self) → ORSModel.ors.List
+Returns a flattened list of the parent hierarchy of the node.
+
+Note The parent hierarchy is flattened.
+Note Expect a depth first search ordering of the nodes.
+See also ORSModel.ors.Node.getIsNodeOneOfMyAscendants()
+Returns:
+output (ORSModel.ors.List) – a list of all nodes above the node (an List)
+
+getAllParentsOfClass(self, pProgId: str) → ORSModel.ors.List
+Returns all the nodes of the specified class found in the parent hierarchy.
+
+Note Result will be an empty list if no match is found.
+Note The search is done depth-first.
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.List) – a list of nodes (an List)
+
+getChildWithGUID(self, aGUID: str) → ORSModel.ors.Node
+Gets an immediate child node with the given GUID.
+
+Note Only immediate children are searched.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Parameters:
+aGUID (str) – a GUID (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a child node if found (a Node), none() otherwise
+
+getChildWithTitle(self, aTitle: str) → ORSModel.ors.Node
+Gets an immediate child node with the given title.
+
+Note Only immediate children are searched.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Parameters:
+aTitle (str) – a string (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a child node if found (a Node), none() otherwise
+
+getChildrenNodes(self) → ORSModel.ors.List
+Returns the list of immediate child nodes.
+
+Returns:
+output (ORSModel.ors.List) – a list of nodes (an List)
+
+getChildrenOfClass(self, pProgId: str) → ORSModel.ors.List
+Returns the nodes of the specified class found in the immediate children.
+
+Note Result will be an empty list if no match is found.
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.List) – a list of nodes (an List)
+
+getClassNameStatic() → str
+getClassNameStatic
+
+Returns:
+output (str) –
+
+getFirstChildOfClass(self, pProgId: str) → ORSModel.ors.Node
+Returns the first object of the specified class found in the child hierarchy.
+
+Note The search is done breadth-first.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a node if one exists (a Node), none() otherwise
+
+getFirstChildOfClassAndPrivateTitle(self, pProgId: str, privateTitle: str) → ORSModel.ors.Node
+Searches the hierarchy for a child node with the specified class and private title.
+
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+See also ORSModel.ors.Managed.setPrivateTitle(), ORSModel.ors.Managed.getPrivateTitle(), ORSModel.ors.Node.getFirstParentOfClassAndPrivateTitle()
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+privateTitle (str) – some text (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a node if it exists (a Node), none() otherwise
+
+getFirstFrameTowardsNode(self, anINode: ORSModel.ors.Node) → ORSModel.ors.ReferenceFrame
+Gets the first frame found going up the hierarchy towards a given object.
+
+Parameters:
+anINode (ORSModel.ors.Node) – the target node (an Node)
+
+Returns:
+output (ORSModel.ors.ReferenceFrame) – a frame (an ReferenceFrame) or none if no frame is found
+
+getFirstNodeWithClassNameTowardsNode(self, pProgId: str, anINode: ORSModel.ors.Node) → ORSModel.ors.Node
+Searches the hierarchy for a parent node with the specified class toward a specific parent nopde.
+
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+See also ORSModel.ors.Managed.setPrivateTitle(), ORSModel.ors.Managed.getPrivateTitle(), ORSModel.ors.Node.getFirstChildOfClassAndPrivateTitle()
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+anINode (ORSModel.ors.Node) – a target node
+
+Returns:
+output (ORSModel.ors.Node) – a node if it exists (a Node), none() otherwise
+
+getFirstParentOfClass(self, pProgId: str) → ORSModel.ors.Node
+Returns the first object of the specified class found in the parent hierarchy.
+
+Note The search is done breadth-first.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a node if one exists (a Node), none() otherwise
+
+getFirstParentOfClassAndPrivateTitle(self, pProgId: str, privateTitle: str) → ORSModel.ors.Node
+Searches the hierarchy for a parent node with the specified class and private title.
+
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+See also ORSModel.ors.Managed.setPrivateTitle(), ORSModel.ors.Managed.getPrivateTitle(), ORSModel.ors.Node.getFirstChildOfClassAndPrivateTitle()
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+privateTitle (str) – some text (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a node if it exists (a Node), none() otherwise
+
+getFrameTransformationFromNode(self, towardNode: ORSModel.ors.Node, pTimeStep: int) → ORSModel.ors.Matrix4x4
+Parameters:
+towardNode (ORSModel.ors.Node) –
+
+pTimeStep (int) –
+
+Returns:
+output (ORSModel.ors.Matrix4x4) –
+
+getImmediateChildOfClass(self, pProgId: str) → ORSModel.ors.Node
+Searches for a child node with the specified class.
+
+Note Only the immediate children are searched, not the hierarchy.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a node if it exists (a Node), none() otherwise
+
+getImmediateParentOfClass(self, pProgId: str) → ORSModel.ors.Node
+Searches for a parent node with the specified class.
+
+Note Only the immediate parents are searched, not the hierarchy.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a node if it exists (a Node), none() otherwise
+
+getImmediateParentWithGUID(self, pGUID: str) → ORSModel.ors.Node
+Gets a parent node with the given GUID.
+
+Note Only immediate parents are searched.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Parameters:
+pGUID (str) – a GUID (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a parent node if found (a Node), none() otherwise
+
+getIsNodeOneOfMyAscendants(self, anINode: ORSModel.ors.Node) → bool
+Checks to see if a specified node is in the parent hierarchy of the node.
+
+Note The parent hierarchy is searched in its entirety for the specified node.
+Note The search is conducted depth-first.
+See also ORSModel.ors.Node.getIsNodeOneOfMyDescendants()
+Parameters:
+anINode (ORSModel.ors.Node) –
+
+Returns:
+output (bool) – true if the specified node in the parent hierarchy, false otherwise
+
+getIsNodeOneOfMyDescendants(self, anINode: ORSModel.ors.Node) → bool
+Checks to see if a specified node is in the child hierarchy of the node.
+
+Note The child hierarchy is searched in its entirety for the specified node.
+Note The search is conducted depth-first.
+See also ORSModel.ors.Node.getIsNodeOneOfMyAscendants()
+Parameters:
+anINode (ORSModel.ors.Node) –
+
+Returns:
+output (bool) – true if the specified node in the child hierarchy, false otherwise
+
+getMaxTSizeOfChilden(self) → int
+Get Maximum T Size of all children node of this node.
+
+Returns:
+output (int) –
+
+getParentNodes(self) → ORSModel.ors.List
+Gets the immediate parent nodes.
+
+Returns:
+output (ORSModel.ors.List) – a list of nodes (a List)
+
+getParentWithGUID(self, pGUID: str) → ORSModel.ors.Node
+Gets a parent node (from the hierarchy) with the given GUID.
+
+Note The whole parent hierarchy is searched.
+Note The search is done breadth-first.
+Note You can type the return value of this method to any subclass of ORSNode, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be none().
+Parameters:
+pGUID (str) – a GUID (a string)
+
+Returns:
+output (ORSModel.ors.Node) – a parent node if found (a Node), none() otherwise
+
+getParentsOfClass(self, pProgId: str) → ORSModel.ors.List
+Returns the nodes of the specified class found in the immediate parents.
+
+Note Result will be an empty list if no match is found.
+Note Use static class names to search for objects (e.g. ORS::ReferenceFrame::getClassNameStatic())).
+Parameters:
+pProgId (str) – the name of the class to test against (a string)
+
+Returns:
+output (ORSModel.ors.List) – a list of nodes (a List)
+
+getVisual(self) → ORSModel.ors.Visual
+Returns:
+output (ORSModel.ors.Visual) – the visual of a model (a Visual)
+
+isVisibleInView(view: View) → bool
+Gets the visibility of the receiver in a given view.
+
+Parameters:
+view (ORSModel.ors.View) – The current view
+
+Returns:
+output (bool) – true if the receiver is visible, false otherwise
+
+none() → Node
+Returns a none object, equivalent to a non-existent object (or null).
+
+Returns:
+output (Node) –
+
+propagateChildrenNodesOrganizationDirty(includeSelf=False)
+Calls for a propagateDirty with the flag OrsChildrenNodesOrganizationDirty
+
+Parameters:
+includeSelf (bool) – True includes the receiver in the propagation, False doesn’t
+
+propagateDataDirty(includeSelf=False)
+Calls for a propagateDirty with the flag OrsDataDirty
+
+Parameters:
+includeSelf (bool) – True includes the receiver in the propagation, False doesn’t
+
+propagateDirty(self, dirtyFlag: str, includeSelf: bool = False)
+Causes a dirty message to be sent to all children nodes.
+
+Note See ORS_def.h for default dirty flag (ex: ORSDataDirty).
+Note A dirty message has different results for different objects, but generally causes a refresh on the data.
+Note Message propagation is done depth-first.
+Parameters:
+dirtyFlag (str) – a string dirty flag (a string)
+
+includeSelf (bool) – should set this dirty (a bool)
+
+propagateGeometryDirty(includeSelf=False)
+Calls for a propagateDirty with the flag OrsGeometryDirty
+
+Parameters:
+includeSelf (bool) – True includes the receiver in the propagation, False doesn’t
+
+propagateHighlightDirty(includeSelf=False)
+Calls for a propagateDirty with the flag OrsHighlightDirty
+
+Parameters:
+includeSelf (bool) – True includes the receiver in the propagation, False doesn’t
+
+propagatePropertyDirty(includeSelf=False)
+Calls for a propagateDirty with the flag OrsPropertyDirty
+
+Parameters:
+includeSelf (bool) – True includes the receiver in the propagation, False doesn’t
+
+propagateVisibilityDirty(includeSelf=False)
+Calls for a propagateDirty with the flag OrsVisibilityDirty
+
+Parameters:
+includeSelf (bool) – True includes the receiver in the propagation, False doesn’t
+
+refresh()
+Refreshes the views related to the current object
+
+refreshAll2DParentViews(self)
+Causes all 2D views in the parent hierarchy of the node to be refreshed.
+
+refreshAll2DParentViewsIfVisible(self)
+Causes all 2D views in the parent hierarchy of the node to be refreshed if it is a model and it visuals are visible in the views.
+
+refreshAll3DParentViews(self)
+Causes all 3D views in the parent hierarchy of the node to be refreshed.
+
+refreshAll3DParentViewsIfVisible(self)
+Causes all 3D views in the parent hierarchy of the node to be refreshed if it is a model and it visuals are visible in the views.
+
+refreshAllParentViews(self)
+Causes all views in the parent hierarchy of the node to be refreshed.
+
+refreshAllParentViewsIfVisible(self)
+Causes all views in the parent hierarchy of the node to be refreshed if it is a model and it visuals are visible in the views.
+
+setAllowRenderingInAllParentViews(self, bValue: bool)
+Allows or prevents rendering in the views affected by a node.
+
+Parameters:
+bValue (bool) – true to allow rendering, false to disallow it.
+
+switchOrderOfPrecedenceOfChildrenNodes(self, anINode1: ORSModel.ors.Node, anINode2: ORSModel.ors.Node) → bool
+Rearranges the order of child nodes.
+
+Note When child nodes are not in the desired order, they can be switched with this method (for example, the order in which they are rendered can be undesired).
+Note Both nodes are swapped in the list of nodes. For example, if nodes are A B C D and this call is made switchOrderOfPrecedenceOfChildrenNodes(A, C), the nodes are then in this order: C B A D.
+Note This method dives down in the child hierarchy until it finds a node where both arguments appear, then performs the switch at that level.
+See also ORSModel.ors.Node.switchOrderOfPrecedenceOfParentNodes()
+Parameters:
+anINode1 (ORSModel.ors.Node) – a child node (a Node)
+
+anINode2 (ORSModel.ors.Node) – a child node (a Node)
+
+Returns:
+output (bool) – true if successful, false otherwise
+
+switchOrderOfPrecedenceOfParentNodes(self, anINode1: ORSModel.ors.Node, anINode2: ORSModel.ors.Node) → bool
+Rearranges the ordering of immediate parent nodes.
+
+Note When parent nodes are not in the desired order, they can be switched with this method.
+Note Both nodes are swapped in the list of nodes. For example, if nodes are A B C D and this call is made switchOrderOfPrecedenceOfParentNodes(A, C), the nodes are then in this order: C B A D.
+Note This method acts only on immediate parent nodes, not the entire parent hierarchy.
+See also ORSModel.ors.Node.switchOrderOfPrecedenceOfChildrenNodes()
+Parameters:
+anINode1 (ORSModel.ors.Node) – a parent node (a Node)
+
+anINode2 (ORSModel.ors.Node) – a parent node (a Node)
+
+Returns:
+output (bool) – true if successful, false otherwise
+
+Managed
+class ORSModel.ors.Managed(*args, **kwargs)
+Bases: ORSBaseClass
+
+An abstract class that implements all the default behavior of managed objects.
+
+addCallbackToEvent(self, anEventName: str, sCallbackName: str, callbackData: int) → bool
+Adds a callback subscription to an event.
+
+Note The callback name for a given event needs to be unique for that event, i.e. no two callbacks for a given event can have the same name.
+Parameters:
+anEventName (str) – name of the event to subscribe to (a string)
+
+sCallbackName (str) – callback name (a string)
+
+callbackData (int) – a pointer to a ORS_EVENT_CALLBACK_INFO structure
+
+Returns:
+output (bool) – true if subscription succeeded, false otherwise
+
+addToDeleteSet(self, anIObject: ORSModel.ors.Managed)
+Add an object to the delete set.
+
+Note All objects have a delete set, which designates those objects that should also be deleted when the receiver gets deleted.
+Parameters:
+anIObject (ORSModel.ors.Managed) – an object (a Managed)
+
+addToSelection(contextInstance)
+Adds the instance to the selection of a context
+
+Parameters:
+contextInstance (plugin instance) – context instance
+
+Note Only representable object can be selected
+applyPreferences()
+Helper for setting the attribute of the object following the preferences
+
+atomicLoad(sFilename: str, bPreserveIdentity: bool) → Managed
+Creates an object from a file where an object was saved.
+
+Parameters:
+sFilename (str) – path of the file to load
+
+bPreserveIdentity (bool) – if true, preserves the identity of the object, false otherwise
+
+Returns:
+output (Managed) – a managed object, or none() if the load fails
+
+atomicLoadFrom(self, anXML: str)
+Loads an object from an XML string.
+
+Parameters:
+anXML (str) – an XML (a string)
+
+Managed.atomicLoadFrom(self, buffer: bytes, nBytes: int)
+
+Loads an object from a memory buffer. Used for python pickling.
+
+Parameters:
+buffer (bytes) – the buffer
+
+nBytes (int) – the number of bytes in the buffer (a uint64_t)
+
+Managed.atomicLoadFrom(self, stream: ORSModel.ors.Stream) -> int
+
+Loads an object from a stream (using callback).
+
+Parameters:
+stream (ORSModel.ors.Stream) – the stream to read data from
+
+Returns:
+output (int) – 0 if successful, otherwise an error code
+
+atomicLoadSpecificNode(self, aFilename: str, aXPathOfTheNodeToLoad: str) → bool
+Loads an object from a file containing several objects.
+
+Parameters:
+aFilename (str) – The file name, including entire path (a string)
+
+aXPathOfTheNodeToLoad (str) – The XPath specification to find the node
+
+Returns:
+output (bool) – true if node was found and loaded, false otherwise
+
+atomicSave(self, aFilename: str, isTemporary: bool = False, iCompressionEngine: int = 1) → int
+Saves the object to a file.
+
+Parameters:
+aFilename (str) – path of the file to save
+
+isTemporary (bool) – if true, try to keep file in memory
+
+iCompressionEngine (int) – the input compression engine (0: None, 1: ZSTD)
+
+Returns:
+output (int) – 0 if successful, otherwise an error code
+
+atomicSaveToLegacyFormat(self, aFilename: str, isTemporary: bool = False, iCompressionEngine: int = 1) → int
+Saves the object to a file in the legacy (2022.2) format.
+
+Parameters:
+aFilename (str) – path of the file to save
+
+isTemporary (bool) – if true, try to keep file in memory
+
+iCompressionEngine (int) – the input compression engine (0: None, 1: ZSTD)
+
+Returns:
+output (int) – 0 if successful, otherwise an error code
+
+atomicSaveToStream(self, stream: ORSModel.ors.Stream, iCompressionEngine: int = 1) → int
+Saves the object to a stream (through callback).
+
+Parameters:
+stream (ORSModel.ors.Stream) – stream object to save current object in
+
+iCompressionEngine (int) – the input compression engine (0: None, 1: ZSTD)
+
+Returns:
+output (int) – 0 if successful, otherwise an error code
+
+copy(self) → ORSModel.ors.Managed
+Returns a copy of the managed.
+
+Note Only the immediate attributes of the managed are copied. The graph surrounding the new managed is the same one as the source managed.
+Note You can type the return value of this method to any subclass of Managed, if you know the class of the object being retrieved. If its class doesn’t match the type specified the return will be NULL.
+Returns:
+output (ORSModel.ors.Managed) – a new managed (a Managed)
+
+createScalarValuesCollection(self)
+method createScalarValuesCollection
+
+deleteObject(self)
+Explicitly deletes the core object wrapped by this Interface object.
+
+deleteObjectAndAllItsChildren(self)
+Explicitly deletes the core object wrapped by this Interface object, along with all its children.
+
+ensureInitialization(self)
+This is for the Python interface.
+
+getAllGroupsContaining(self, anIObject: ORSModel.ors.Managed) → ORSModel.ors.List
+Gets all the groups that contain the given object.
+
+Parameters:
+anIObject (ORSModel.ors.Managed) –
+
+Returns:
+output (ORSModel.ors.List) –
+
+getAllInstancesOf(pProgId: str) → ORSModel.ors.List
+Gathers all existing objects of the specified class.
+
+Parameters:
+pProgId (str) –
+
+Returns:
+output (ORSModel.ors.List) –
+
+getAllObjectsOfClassAndPrivateTitle(pProgId: str, pPrivateTitle: str) → ORSModel.ors.List
+Gathers all existing objects of the specified class, that have a matching private title.
+
+Parameters:
+pProgId (str) – name of the class (a string)
+
+pPrivateTitle (str) – private title to search for (a string)
+
+Returns:
+output (ORSModel.ors.List) – all the objects that match the search criteria (a List)
+
+getAllObjectsOfClassAndTitle(pProgId: str, pTitle: str) → ORSModel.ors.List
+Gathers all existing objects of the specified class, that have a matching title.
+
+Parameters:
+pProgId (str) – name of the class (a string)
+
+pTitle (str) – title to search for (a string)
+
+Returns:
+output (ORSModel.ors.List) – all the objects that match the search criteria (a List)
+
+getAllObjectsOfClassAndUserData(pProgId: str, userDataKey: str, userDataValue: str) → ORSModel.ors.List
+Gathers all existing objects of the specified class, that have a matching user data.
+
+Parameters:
+pProgId (str) – name of the class (a string)
+
+userDataKey (str) – key of the user data (a string)
+
+userDataValue (str) – value to look for (a string)
+
+Returns:
+output (ORSModel.ors.List) – all the objects that match the search criteria (a List)
+
+getAllRepresentableInstancesOf(pProgId: str) → ORSModel.ors.List
+Gathers all existing objects of the specified class that are representable.
+
+Parameters:
+pProgId (str) –
+
+Returns:
+output (ORSModel.ors.List) –
+
+getAllRepresentableObjects() → ORSModel.ors.List
+Gets all the representable objects of the world.
+
+Returns:
+output (ORSModel.ors.List) – a list containing all the representable objects
+
+getAtomicTextRepresentation(self, bSelfContained: bool) → str
+Retrieves the object’s atomic text representation.
+
+Parameters:
+bSelfContained (bool) –
+
+Returns:
+output (str) –
+
+getAutoDelete(self) → bool
+Gets the autodelete value.
+
+See also ORSModel.ors.Managed.setAutoDelete()
+Returns:
+output (bool) –
+
+getBinaryUserInfo(self, pTag: str)
+Retrieves a user defined binary value. Typed as void* for sip, but it’s in reality an unsigned char*.
+
+Note If the key doesn’t exist, nullptr is returned
+Parameters:
+pTag (str) – key of the data (a string)
+
+getBinaryUserInfoSize(self, pTag: str) → int
+Retrieves the size of a user defined binary value.
+
+Note If the key doesn’t exist, 0 is returned
+Parameters:
+pTag (str) – key of the data (a string)
+
+Returns:
+output (int) – the size of the data (a uint32_t)
+
+getCallbacksEnabled(self) → bool
+Queries the object to know if its callbacks are enabled or disabled.
+
+Returns:
+output (bool) – true if callbacks are enabled, false otherwise
+
+getChildrenNodesOrganizationDirtySignature()
+Gets the current dirty signature for the flag OrsChildrenNodesOrganizationDirty
+
+Returns:
+childrenNodesOrganizationDirtySignature (int) – the dirty signature
+
+getClassName(self) → str
+Retrieves the class name of the core object wrapped by this Interface object.
+
+Returns:
+output (str) – the class name (a string)
+
+getClassNameStatic() → str
+getClassNameStatic
+
+Returns:
+output (str) –
+
+getCreationTime(self) → int
+Returns the time Number of seconds since Jan 1 2000 of creation of this object.
+
+Returns:
+output (int) – a uint32_t
+
+getDataChecksum(self) → str
+Returns the computed checksum of the data.
+
+Returns:
+output (str) –
+
+getDataDirtySignature()
+Gets the current dirty signature for the flag OrsDataDirty
+
+Returns:
+dataDirtySignature (int) – the dirty signature
+
+getDirtySignature(self, dirtyFlag: str) → int
+Gets the current dirty signature.
+
+Note Objects can be dirty for several aspects, see the ors_def.h file for the different dirty aspects.
+Parameters:
+dirtyFlag (str) – dirty flag name (a string, see note below)
+
+Returns:
+output (int) – dirty signature (a uint64_t)
+
+getEntireDirtySignature(self) → int
+Gets the current dirty signature for all aspects, added up.
+
+Note Objects can be dirty for several aspects, see the ors_def.h file for the different dirty aspects.
+Returns:
+output (int) – entire dirty signature (a uint64_t)
+
+getEventCallbackEnabled(self, sEventName: str, sCallbackName: str) → bool
+Gets the enabled state of a callback subscription to an event.
+
+Parameters:
+sEventName (str) – event name (a string)
+
+sCallbackName (str) – callback name (a string)
+
+Returns:
+output (bool) – true if callback is enabled, false if disabled or if the callback subscription did not exist
+
+getGUID(self) → str
+Retrieves the GUID of the core object.
+
+Note The GUID is the unique identifier of the object. No two objects can have the same GUID. Once you have an object’s GUID, at any time you can obtain a reference to that object via its GUID, given that the object is still alive.
+Returns:
+output (str) –
+
+getGeometryDirtySignature()
+Gets the current dirty signature for the flag OrsGeometryDirty
+
+Returns:
+geometryDirtySignature (int) – the dirty signature
+
+getHasCallbacksForEvent(self, anEventName: str) → bool
+Checks if the receiver has any callbacks for an event.
+
+Parameters:
+anEventName (str) – name of the event (a string)
+
+Returns:
+output (bool) – true if callbacks exist for the event, false otherwise
+
+getHighlightDirtySignature()
+Gets the current dirty signature for the flag OrsHighlightDirty
+
+Returns:
+highlightDirtySignature (int) – the dirty signature
+
+getIsDirty(self, dirtyFlag: str) → bool
+Gets if the object is dirty for a specific dirty flag.
+
+Parameters:
+dirtyFlag (str) – dirty flag name (a string, see note below)
+
+Returns:
+output (bool) – true if object is dirty, false otherwise
+
+getIsDirtyAnyDirtyFlag(self) → bool
+Gets if the object is dirty for any of the dirty flags.
+
+Returns:
+output (bool) – true if object is dirty, false otherwise
+
+getIsEqualTo(self, aManaged: ORSModel.ors.Managed) → bool
+Checks if the two objects are equal.
+
+Parameters:
+aManaged (ORSModel.ors.Managed) – an object to compare with (a Managed)
+
+Returns:
+output (bool) – true if the receiver and the argument are equal (class dependent), false otherwise
+
+getIsIdentityPreservedForPickling(self) → bool
+Returns True if the GUID is preserved when pickling and unpickling an object.
+
+Returns:
+output (bool) – Returns True if the GUID is preserved when pickling and unpickling an object
+
+getIsInDeleteSet(self, anIObject: ORSModel.ors.Managed) → bool
+Gets if an object is included in the receiver delete set.
+
+Note The delete set is a list of objects that are to be deleted when the receiver is deleted.
+Parameters:
+anIObject (ORSModel.ors.Managed) – object to look for in the receiver delete set (a Managed)
+
+Returns:
+output (bool) – true if the object is in the delete set of the receiver, false otherwise
+
+getIsInstanceOf(self, pProgId: str) → bool
+Queries the object to know if it is an instance of a certain class.
+
+Parameters:
+pProgId (str) –
+
+Returns:
+output (bool) –
+
+getIsRepresentable(self) → bool
+Queries the object to know if it is representable.
+
+Returns:
+output (bool) –
+
+getIsSameObjectAs(self, anObject: ORSModel.ors.Managed) → bool
+Checks to see if the receiver wraps the same underlying object as the supplied argument.
+
+Parameters:
+anObject (ORSModel.ors.Managed) – an object to compare with (a Managed)
+
+Returns:
+output (bool) – true if underlying object is the same for both the receiver and the argument, false otherwise
+
+getIsToBeKeptAliveUntilExit(self) → bool
+Queries the object to know if it is permanent for the life of the application.
+
+Note Permanent objects survive a new session, i.e. they live until the application is terminated.
+Returns:
+output (bool) – true if object is permanent, false otherwise
+
+getIsToBeSaved(self) → bool
+Queries the object to know if it should be saved in a session file.
+
+Returns:
+output (bool) – true if object should be saved, false otherwise
+
+getMetadataChecksum(self) → str
+Returns the computed checksum of the metadata.
+
+Returns:
+output (str) –
+
+getObjectWithGUID(guid: str) → ORSModel.ors.Managed
+Retrieves an object from its GUID.
+
+Parameters:
+guid (str) – a GUID (a string)
+
+Returns:
+output (ORSModel.ors.Managed) – An object or none if object is not found
+
+getObjectWithGUIDasPointer(guid: str) → ORSModel.ors.Managed
+Retrieves an object from its GUID.
+
+Parameters:
+guid (str) – a GUID (a string)
+
+Returns:
+output (ORSModel.ors.Managed) – An object or nullptr if object is not found
+
+getPrivateTitle(self) → str
+Gets the private title of the object.
+
+Note The private title is never shown in the application, but is a means by which an object can be found (getAllObjectsOfClassAndPrivateTitle for example).
+Returns:
+output (str) – private title of the object (a string)
+
+getPropertyDirtySignature()
+Gets the current dirty signature for the flag OrsPropertyDirty
+
+Returns:
+propertyDirtySignature (int) – the dirty signature
+
+getPythonRepresentation(self) → str
+Gets a Python evaluable string representation.
+
+Returns:
+output (str) – The object’s representation (a string)
+
+getReferenceCount(self) → int
+Returns the count of references to the object.
+
+Returns:
+output (int) – the count of references (an int)
+
+getScalarValuesCollection(self) → ORSModel.ors.ScalarValuesCollection
+method getScalarValuesCollection
+
+Returns:
+output (ORSModel.ors.ScalarValuesCollection) –
+
+getTitle(self) → str
+Gets the title of the object.
+
+Returns:
+output (str) – the title (a string)
+
+getUserInfo(self, pTag: str) → str
+Retrieves a user defined value.
+
+Note If the key doesn’t exist an empty string is returned.
+Parameters:
+pTag (str) – key of the data (a string)
+
+Returns:
+output (str) – the data (a string)
+
+getUserInfoAsArray(self) → ORSModel.ors.ArrayString
+Retrieves the user info as a string array.
+
+Note The user info data is flattened into an array of string pairs, for the key and the value.
+Returns:
+output (ORSModel.ors.ArrayString) – the data (an ArrayString, see note below)
+
+getUserInfoAsDictionary()
+User info copy of Managed in a easy way for manipulation
+
+return a copy of the object user info as a dictionary
+
+getUserInfoMatchingPattern(self, pattern: str, case_sensitive_search: bool) → List[str]
+Searches the user info dictionary based on a pattern matching.
+
+Note The pattern matching is done via regex.
+Parameters:
+pattern (str) – a search pattern (a string)
+
+case_sensitive_search (bool) – true to search case-sensitive, false otherwise (a bool)
+
+Returns:
+output (List[str]) – a list of keys and values pairs, for all matching keys (a list of strings)
+
+getVisibilityDirtySignature()
+Gets the current dirty signature for the flag OrsVisibilityDirty
+
+Returns:
+visibilityDirtySignature (int) – the dirty signature
+
+isManaged(self) → bool
+Returns:
+output (bool) –
+
+isNone(self) → bool
+Checks if the underlying core object is None.
+
+Note Interface objects hold references to core objects, so this method checks to see if a core object is truly referred to.
+Returns:
+output (bool) – true if the core object is non-existent, false otherwise.
+
+isNotNone(self) → bool
+Checks if the underlying core object is not None.
+
+Note Interface objects hold references to core objects, so this method checks to see if a core object is truly referred to.
+Returns:
+output (bool) – true if the core object is existent, false otherwise.
+
+none() → Managed
+Returns a none object, equivalent to a non-existent object (or null).
+
+Returns:
+output (Managed) –
+
+publish()
+Sets an object as representable and notifies the Dragonfly UI of a new available object
+
+removeBinaryUserInfo(self, pTag: str)
+Removes a user defined binary value.
+
+Parameters:
+pTag (str) – key name of the binary value (a string)
+
+removeCallbackFromEvent(guid: str, sEventName: str, sCallbackName: str, bRemoveInDeletedObject: bool) → bool
+Removes a callback subscription to an event.
+
+Parameters:
+guid (str) – object GUID (a string)
+
+sEventName (str) – name of the callback event (a string)
+
+sCallbackName (str) – name of the callback (a string)
+
+bRemoveInDeletedObject (bool) – if true, the callback will be removed from the object even if that object is in the process of being deleted (a boolean)
+
+Returns:
+output (bool) – true callback existed, false otherwise
+
+removeFromDeleteSet(self, anIObject: ORSModel.ors.Managed)
+Remove an object from the delete set.
+
+Note The delete set is a list of objects that are to be deleted when the receiver is deleted.
+Parameters:
+anIObject (ORSModel.ors.Managed) – object to be removed from the delete set (a Managed)
+
+removeUserInfo(self, pTag: str)
+Removes a user defined value.
+
+Parameters:
+pTag (str) – key of the data (a string)
+
+selectExclusively(contextInstance)
+Selects only the current instance for a context
+
+Parameters:
+contextInstance (plugin instance) – context instance
+
+Note Only representable object can be selected
+setAsTemporaryObject(isTemporaryObject=True)
+Helper for setting useful properties when marking an object as a (non-)temporary object.
+
+Parameters:
+isTemporaryObject (bool) – if True, the object will be set as temporary (not representable, not to be saved, callbacks disabled). Otherwise, these properties are set as the opposite.
+
+setAutoDelete(self, value: bool)
+When set to true, the interface object will call deleteObject on its core object when it is being deleted.
+
+Parameters:
+value (bool) –
+
+setBinaryUserInfo(self, pTag: str, pValue: bytes, iDataSize: int)
+Sets a user defined binary value.
+
+Note Objects can carry user defined data in the form of strings or binary data.
+See also ORSModel.ors.Managed.setUserInfo(), ORSModel.ors.Managed.getUserInfo(), ORSModel.ors.Managed.getBinaryUserInfo()
+Parameters:
+pTag (str) – key of the data (a string)
+
+pValue (bytes) – the data (an unsigned char* buffer)
+
+iDataSize (int) – the size of the data (a uint32_t)
+
+setCallbacksEnabled(self, enabled: bool)
+Sets the object’s callbacks to be enabled or not.
+
+Note When an object’s callbacks are disabled, absolutely no callbacks are triggered from the receiver.
+Parameters:
+enabled (bool) – true to enable callbacks, false otherwise
+
+setChildrenNodesOrganizationDirty()
+Calls for a setDirty with the flag OrsChildrenNodesOrganizationDirty
+
+setDataDirty()
+Calls for a setDirty with the flag OrsDataDirty
+
+setDirty(self, dirtyFlag: str)
+Sets the object as being dirty for a given aspect.
+
+Note A dirty object is an object that has changed, giving its observers a chance to refresh their view on the object. Several aspects of an object can be dirty, see ORS_def.h for dirty signature flags.
+Parameters:
+dirtyFlag (str) – dirty flag name (a string)
+
+setEventCallbackEnabled(self, sEventName: str, sCallbackName: str, bValue: bool) → bool
+Enables/disables a callback subscription to an event.
+
+Note Works for all callback types (object, class and global)
+Parameters:
+sEventName (str) – event name (a string)
+
+sCallbackName (str) – callback name (a string)
+
+bValue (bool) – true to enable the callback, false to disable it
+
+Returns:
+output (bool) – true if callback subscription existed, false otherwise
+
+setGeometryDirty()
+Calls for a setDirty with the flag OrsGeometryDirty
+
+setHighlightDirty()
+Calls for a setDirty with the flag OrsHighlightDirty
+
+setIdentityIsPreservedForPickling(self, value: bool)
+Set to True if the GUID is to be preserved when pickling and unpickling an object.
+
+Parameters:
+value (bool) –
+
+setIsNotDirty(self)
+Sets the object as not being dirty for all dirty flags.
+
+setIsRepresentable(self, isRepresentable: bool)
+Sets the object to be representable or not.
+
+Note Non representable objects don’t appear in lists and such, the implicit meaning is that these objects are transient and temporary.
+Parameters:
+isRepresentable (bool) – true to make the object representable, false otherwise
+
+setIsToBeKeptAliveUntilExit(self, pFlag: bool)
+Sets the object to be permanent for the life of the application.
+
+Note Permanent objects survive a new session, i.e. they live until the application is terminated.
+Parameters:
+pFlag (bool) – true to make the object permanent, false otherwise
+
+setIsToBeSaved(self, pIsToBeSaved: bool)
+Sets the object to be saved to session files or not.
+
+Parameters:
+pIsToBeSaved (bool) – true to cause the object to be saved to session files, false otherwise
+
+setPrivateTitle(self, newPrivateTitle: str)
+Sets the private title of the object.
+
+Note The private title can later be used to find a reference to that object, given that it’s still alive.
+Parameters:
+newPrivateTitle (str) – a title (a string)
+
+setPropertyDirty()
+Calls for a setDirty with the flag OrsPropertyDirty
+
+setTitle(self, newVal: str)
+Sets the title of the object.
+
+Dirty flags: OrsPropertyDirty
+
+Anonymize newVal:
+True
+
+Parameters:
+newVal (str) – new title (a string)
+
+setUserInfo(self, pTag: str, pValue: str)
+Parameters:
+pTag (str) –
+
+pValue (str) –
+
+setUserInfoFromDictionary(aDic)
+Add key value pair to the user Info of the Object. an str call are done on the key and values to insure that we respect the UserInfo protocol of Managed Object
+
+Parameters:
+aDic (dict) – a dictionary of information to add to the user information
+
+setVisibilityDirty()
+Calls for a setDirty with the flag OrsVisibilityDirty
+
+switchAvailabilityToContext(oldContextID, newContextID)
+Switches the availability of the object from an old context to a new context. This will be done only if the old context ID is found in the set of available contexts and the new context ID is not already in the set of available contexts. The availability for all other contexts remains unchanged.
+
+The arguments oldContextID and newContextID are used as strings instead of plugin instances to support the situation where the old or new context is not existing (for example, to perform a copy of the objects).
+
+Parameters:
+oldContextID (str) – old context ID
+
+newContextID (str) – new context ID
+
+triggerClassEvent(self, sEventName: str) → bool
+Triggers a class event.
+
+Parameters:
+sEventName (str) –
+
+Returns:
+output (bool) –
+
+unpublish()
+Sets an object as non-representable and notifies the Dragonfly UI of a loss of the availability of the object.
+
+unselect(contextInstance)
+Unselects the instance for a context
+
+Parameters:
+contextInstance (plugin instance) – context instance
+
+ORSBaseClass
+class ORSModel.ors.ORSBaseClass
+An abstract class from which all objects issued from the ORS Core Library inherit.
+
+getPythonTraceBack() → List[str]
+Set the python traceback for a call from python.
+
+Returns:
+output (List[str]) –
+
+isManaged(self) → bool
+Returns:
+output (bool) –
+
+isNone(self) → bool
+Returns:
+output (bool) –
+
+setPythonTraceBack(tb: List[str])
+Set the python traceback for a call from python.
+
+Parameters:
+tb (List[str]) –

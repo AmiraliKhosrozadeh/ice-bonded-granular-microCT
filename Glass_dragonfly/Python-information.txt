@@ -1,0 +1,10 @@
+Jupyter QtConsole 5.6.1
+Python 3.10.13 | packaged by conda-forge | (main, Oct 26 2023, 18:01:37) [MSC v.1935 64 bit (AMD64)]
+Type 'copyright', 'credits' or 'license' for more information
+IPython 8.37.0 -- An enhanced Interactive Python. Type '?' for help.
+from config.pythonConsoleAutoImport import *
+
+
+from config.pythonConsoleAutoImport import *
+
+

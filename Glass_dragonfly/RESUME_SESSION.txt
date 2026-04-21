@@ -1,0 +1,444 @@
+================================================================================
+  COMPLETE DOCUMENTATION — Glass CT Segmentation Pipeline
+  Reusable for: Alumina, Sand, and any other specimen
+  Last updated: 2026-04-16
+================================================================================
+
+
+============================
+  1. PROJECT OVERVIEW
+============================
+
+Specimen: Glass beads + ice + trapped air in cylindrical holder
+Software: Dragonfly 2025.1.0.2053 (Python 3.10.13, conda-forge)
+Goal:     Segment CT volume into phases, create ROIs in Dragonfly,
+          quantify trapped air / ice / solid fractions
+
+Phases segmented (Glass specimen):
+  Label 0 = Outside air       (gray < T_AIR_ICE, outside cylinder OR largest connected component)
+  Label 1 = Trapped air       (gray < T_AIR_ICE, small air pockets inside specimen)
+  Label 2 = Ice               (T_AIR_ICE <= gray < T_ICE_GLASS)
+  Label 3 = Glass beads       (gray >= T_ICE_GLASS, aluminum merged into glass)
+
+Note: Aluminum was originally a separate phase (label 4, gray >= 50000) but only
+1,654 voxels were classified as aluminum — indistinguishable from glass noise.
+Aluminum is now merged into glass (T_GLASS_AL = 65536, above uint16 max).
+For specimens with real aluminum content, lower T_GLASS_AL to separate them.
+
+
+============================
+  2. DATA LOCATIONS
+============================
+
+Raw TIFFs:       E:\RPTU-images\CT_images\Glass\Glass_100_1800_T5_01\
+File pattern:    Glass-1001800-T5-normal_100XXL_uc_xy_XXXX.tif
+Scripts:         E:\RPTU-images\CT_images\Glass\Glass_dragonfly\
+Segmentation:    E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation\
+Overview PNG:    E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation_overview.png
+Dragonfly session: E:\RPTU-images\CT_images\Glass\Glass_dragonfly\Glass.ORSSession._ctcsav
+
+
+============================
+  3. PARAMETERS (Glass)
+============================
+
+TIFF slices:     0098.tif to 0961.tif  (864 slices total)
+Crop X:          565 to 1008  (444 voxels)
+Crop Y:          117 to 548   (432 voxels)
+Voxel size:      24.766 um isotropic (2.4766e-05 m)
+Bit depth:       uint16
+
+Cylinder (from Dragonfly, world coordinates in um):
+  Cap1 (top):    (19659.08, 8209.18,   139.36) um
+  Cap2 (bottom): (18630.93, 8209.18, 21330.49) um
+  Center:        (19145.01, 8209.18, 10734.93) um
+  Radius:        5176.45 um
+  Height:        21216.06 um
+
+  IMPORTANT: The cylinder is TILTED ~2.8 degrees in the XZ plane.
+  Cap1 X = 19659 um, Cap2 X = 18631 um -> ~1028 um X shift (~41 voxels).
+  The script interpolates the cylinder center per Z slice to follow the tilt.
+
+CT channel origin in Dragonfly (um):
+  (13980.41, 2885.24, -12.38)
+
+Cylinder in cropped voxel coordinates (computed from world coords):
+  Cap1: X=229.3, Y=215.0, Z=6.1
+  Cap2: X=187.8, Y=215.0, Z=861.7
+  Radius: 209.0 vox
+
+Histogram thresholds (from histogram_analysis.py):
+  T_AIR_ICE   = 5301    (air/ice boundary)
+  T_ICE_GLASS = 17579   (ice/glass boundary)
+  T_GLASS_AL  = 65536   (disabled — aluminum merged into glass)
+
+Histogram peaks:
+  Peak 1: ~1,563  -> Air
+  Peak 2: ~9,039  -> Ice
+  Peak 3: ~26,118 -> Glass beads
+
+Noise removal thresholds:
+  MIN_ICE_VOXELS   = 500   (ice clusters smaller than this -> reclassified as glass)
+  MIN_GLASS_VOXELS = 10    (glass clusters smaller than this -> reclassified as ice)
+  MIN_TRAPPED_AIR_VOXELS = 0  (disabled)
+
+
+============================
+  4. FINAL SEGMENTATION RESULTS (Glass)
+============================
+
+(Results before noise removal and tilted cylinder fix — will update after next run)
+
+  Outside air        :   70,002,129 voxels | 1063.36 mm3 | 42.24% total
+  Trapped air        :      156,744 voxels |    2.38 mm3 |  0.09% total |  0.16% specimen
+  Ice                :   43,054,795 voxels |  654.02 mm3 | 25.98% total | 44.98% specimen
+  Glass beads        :   52,508,444 voxels |  797.62 mm3 | 31.68% total | 54.85% specimen
+    (includes former 1,654 aluminum voxels)
+
+  Ice fraction of specimen       : 44.98%
+  Total pore fraction (ice+air)  : 45.14%
+
+
+============================
+  5. SEGMENTATION PIPELINE (step by step)
+============================
+
+The pipeline has 7 steps. Steps 1-6 are pure Python (numpy, scipy, matplotlib).
+Step 7 uses Dragonfly API and only runs inside Dragonfly's Jupyter console.
+
+--- Step 1: Load cropped volume ---
+  - Read TIFF files from FIRST_SLICE to LAST_SLICE
+  - Crop each slice: img[Y_MIN:Y_MAX+1, X_MIN:X_MAX+1]
+  - Stack into 3D numpy array: shape (Z, Y, X), dtype uint16
+
+--- Step 2: Build TILTED cylinder mask ---
+  - Cylinder axis goes from Cap1 to Cap2 (not vertical — tilted ~2.8 deg)
+  - For each Z slice, interpolate the cylinder center:
+      t = (z - cap1_z) / (cap2_z - cap1_z)
+      cx(z) = cap1_x + t * (cap2_x - cap1_x)
+      cy(z) = cap1_y + t * (cap2_y - cap1_y)
+  - Circle test per slice: (x - cx(z))^2 + (y - cy(z))^2 <= radius^2
+  - Only slices within Z cap range are inside the cylinder
+
+  WHY tilted: The specimen holder is not perfectly vertical in the CT scanner.
+  Using a fixed center would cut off beads at the top/bottom edges.
+
+--- Step 3: Threshold phases inside cylinder ---
+  - seg array initialized to 0 (OUTSIDE_AIR)
+  - Inside cylinder:
+      gray < T_AIR_ICE                  -> TRAPPED_AIR (1)
+      T_AIR_ICE <= gray < T_ICE_GLASS   -> ICE (2)
+      gray >= T_ICE_GLASS               -> GLASS (3)
+  - Outside cylinder stays 0
+
+--- Step 3b: Separate outside air from trapped air ---
+  WHY: The cylinder mask is loose (bigger than the real specimen).
+  There is a ring of air between the cylinder wall and the specimen surface.
+  Without this step, all that air would be labeled "trapped air" (wrong).
+
+  METHOD: 3D connected component labeling on all air voxels inside cylinder.
+  - scipy.ndimage.label(air_mask) -> finds connected components
+  - Largest component = outside air ring -> relabel to OUTSIDE_AIR (0)
+  - All smaller components = real trapped air pockets -> keep as TRAPPED_AIR (1)
+
+  This is the KEY STEP that makes the segmentation correct.
+
+--- Step 3c: Remove salt-and-pepper noise ---
+  - Ice: connected component labeling, remove clusters < MIN_ICE_VOXELS (500)
+    Removed ice voxels -> reclassified as glass
+  - Glass: connected component labeling, remove clusters < MIN_GLASS_VOXELS (10)
+    Removed glass voxels -> reclassified as ice
+    NOTE: Keep MIN_GLASS_VOXELS small! Real glass beads can be ~500 voxels.
+    Setting it too high (e.g. 1000) removes real beads.
+  - Trapped air: disabled by default (MIN_TRAPPED_AIR_VOXELS = 0)
+
+--- Step 4: Statistics ---
+  - Count voxels per label
+  - Convert to mm3: n_voxels * (VOXEL_SIZE_UM)^3 / 1e9
+  - Calculate specimen = everything except OUTSIDE_AIR
+  - Ice fraction = ice / specimen * 100
+  - Pore fraction = (ice + trapped_air) / specimen * 100
+
+--- Step 5: Save TIFF stack ---
+  - Display values: seg * 50 -> 0/50/100/150 (uint8)
+  - Saved to OUT_DIR as seg_0000.tif, seg_0001.tif, ...
+
+--- Step 6: Save overview PNG ---
+  - 3 orthogonal slices (XY, XZ, YZ) at volume center
+  - Color-coded: black=outside air, red=trapped air, blue=ice, tan=glass
+  - Saved as segmentation_overview.png
+
+--- Step 7: Create ROIs in Dragonfly ---
+  (Only runs inside Dragonfly Jupyter console)
+  See Section 7 below for full details.
+  Creates 3 ROIs: ROI_TrappedAir, ROI_Ice, ROI_GlassBeads
+
+
+============================
+  6. HOW TO RUN
+============================
+
+In Dragonfly Jupyter QtConsole:
+
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation.py', encoding='utf-8').read(), globals())
+
+IMPORTANT NOTES:
+  - encoding='utf-8' is REQUIRED (Windows default cp1252 causes UnicodeDecodeError)
+  - globals() is REQUIRED (passes Dragonfly's ORS namespace into the script)
+  - The CT dataset must be loaded in Dragonfly before running
+  - Script takes ~5 seconds total (1.5s loading, 1.1s connected components)
+
+For Steps 1-6 only (outside Dragonfly, no ROI creation):
+  python segmentation.py
+  (Step 7 will print an import error and skip -- this is expected)
+
+
+============================
+  7. DRAGONFLY API — COMPLETE REFERENCE
+============================
+
+All of this was discovered through trial and error in Dragonfly 2025.1.0.2053.
+These patterns are CONFIRMED WORKING. Do not guess alternatives.
+
+--- 7a. Imports ---
+
+  from ORSModel import createChannelFromNumpyArray, ROI, orsColor, Channel
+
+  # WorkingContext (for reference -- NOT usable from scripts):
+  # from OrsLibraries.workingcontext import WorkingContext
+  # All WorkingContext methods need a plugin instance as first arg.
+  # Cannot be used from standalone scripts or Jupyter console.
+
+--- 7b. Find existing channels in workspace ---
+
+  cls_name = Channel.getClassNameStatic()           # returns 'CxvChannel'
+  all_channels = Channel.getAllObjectsOfClass(cls_name)  # NEEDS cls_name string!
+  for ch in all_channels:
+      title = ch.getTitle()     # display title (e.g. 'Glass-1001800-T5-...')
+      # NOT ch.getName() which returns UUID string like 'orsObj(B2CC4AE1...)'
+
+--- 7c. Create temporary channel from numpy ---
+
+  seg_ch = createChannelFromNumpyArray(arr.astype(np.uint8))
+  seg_ch.setTitle('_seg_temp_delete_me')
+  seg_ch.publish()     # REQUIRED -- getAsROIWithinRange only works on published channels
+
+--- 7d. Extract ROI from channel ---
+
+  roi_tmp = ROI()
+  roi_tmp.copyShapeFromStructuredGrid(seg_ch)    # MUST match source channel dimensions
+  seg_ch.getAsROIWithinRange(vmin, vmax, None, roi_tmp)
+  # vmin, vmax = raw integer thresholds (e.g. 49, 51 for value 50)
+  # Normalized thresholds (0-1) did NOT work in our testing
+
+--- 7e. Remap ROI to CT channel coordinates (CRITICAL for 2D visibility) ---
+
+  roi_ct = roi_tmp.makeROIForChannel(ct_channel, 0, 0, 0)
+  # Arguments: (target_channel, x_offset, y_offset, z_offset)
+  # Offsets (0,0,0) because seg and CT cover the same cropped volume
+  # Returns a NEW ROI object in the target channel's coordinate system
+
+  roi_ct.setTitle('ROI_Ice')
+  roi_ct.setInitialColor(orsColor(0.4, 0.7, 1.0, 1.0))   # RGBA
+  roi_ct.publish()
+
+  WHY this step is needed:
+  - createChannelFromNumpyArray creates a channel with DEFAULT coordinates
+  - The CT channel has REAL physical coordinates (origin, voxel spacing)
+  - Without remapping, ROI exists at wrong location -> invisible in 2D views
+  - makeROIForChannel transforms ROI to target channel's coordinate system
+
+--- 7f. Alternative methods (for reference) ---
+
+  adaptToChannel(pChannel, x, y, z, pTSourceOffset, pTRange)
+    # pTSourceOffset=0, pTRange=1 for single-frame volumes
+    # Modifies ROI in-place (does not return a new ROI)
+
+  getAsROIMovedInChannel(pInputData, xOffset, yOffset, zOffset, pTargetROI)
+    # Moves ROI by voxel offset within a channel
+
+--- 7g. Delete objects ---
+
+  obj.deleteObject()    # works for Channel and ROI
+  # NOT obj.remove() -- that also works but deleteObject() is documented
+
+--- 7h. Methods that DO NOT EXIST ---
+
+  ROI.getArray()              -- no NumPy access on ROI objects
+  ROI.show()                  -- does not exist in Dragonfly 2025.1
+  WorkingContext.getCurrentWorkingContext()  -- does not exist
+  Channel.getName()           -- returns UUID, not display title (use getTitle())
+
+--- 7i. Physical coordinate methods on channels ---
+
+  ct_channel.getOrigin()      -> orsVect(x, y, z) in meters
+  ct_channel.getXSpacing()    -> voxel size in X (meters)
+  ct_channel.getYSpacing()    -> voxel size in Y (meters)
+  ct_channel.getZSpacing()    -> voxel size in Z (meters)
+  ct_channel.setOrigin(x, y, z)
+  ct_channel.setXSpacing(val)
+  ct_channel.setYSpacing(val)
+  ct_channel.setZSpacing(val)
+
+
+============================
+  8. DISPLAY VALUES FOR TIFF EXPORT
+============================
+
+Segmentation values are scaled x50 for TIFF export:
+  Label 0 (Outside air)  -> pixel value 0
+  Label 1 (Trapped air)  -> pixel value 50
+  Label 2 (Ice)          -> pixel value 100
+  Label 3 (Glass beads)  -> pixel value 150
+  (Label 4 Aluminum was removed — merged into glass)
+
+For ROI extraction from this TIFF channel, use raw integer thresholds:
+  Trapped air:  vmin=49,  vmax=51
+  Ice:          vmin=99,  vmax=101
+  Glass beads:  vmin=149, vmax=151
+
+
+============================
+  9. ADAPTING FOR OTHER SPECIMENS (Alumina, Sand, etc.)
+============================
+
+To reuse this pipeline for a different specimen, change these parameters:
+
+--- 9a. What MUST change ---
+
+  TIFF_DIR        Path to raw TIFF folder
+  FILE_PREFIX     TIFF filename prefix (before the 4-digit number)
+  FIRST_SLICE     First TIFF file number
+  LAST_SLICE      Last TIFF file number
+
+  X_MIN, X_MAX    Crop bounds in X (from Dragonfly crop operation)
+  Y_MIN, Y_MAX    Crop bounds in Y
+
+  Cylinder parameters (world coordinates in um from Dragonfly):
+    CYL_CAP1_UM     (X, Y, Z) of cap1 in um
+    CYL_CAP2_UM     (X, Y, Z) of cap2 in um
+    CYL_RADIUS_UM   radius in um
+    CT_ORIGIN_UM    CT channel origin in um (from ct_channel.getOrigin() * 1e6)
+    The script automatically converts to voxel coordinates and handles tilt.
+
+  T_AIR_ICE       Threshold between air and first solid phase
+  T_ICE_GLASS     Threshold between phases
+  T_GLASS_AL      Threshold for densest phase (set to 65536 to disable)
+
+  VOXEL_SIZE_UM   Voxel size in micrometers (isotropic)
+
+  OUT_DIR         Output directory for segmentation TIFFs
+  overview_path   Path for overview PNG
+
+  CT channel name in Step 7: change 'Glass-1001800' to match new dataset name
+
+--- 9b. What MAY change ---
+
+  LABEL_NAMES     Phase names (e.g. 'Sand' instead of 'Glass beads')
+  phase_defs      ROI names and colors in Step 7
+  Number of phases (may need to add/remove thresholds and labels)
+  MIN_ICE_VOXELS, MIN_GLASS_VOXELS  Noise removal thresholds
+
+--- 9c. What stays the same ---
+
+  The pipeline structure (Steps 1-7)
+  The tilted cylinder masking approach
+  The connected component method for separating outside air from trapped air
+  The noise removal method (Step 3c)
+  The Dragonfly API patterns (Section 7)
+  The TIFF scaling (x50)
+
+--- 9d. How to determine new thresholds ---
+
+  1. Run histogram_analysis.py on the new dataset (or write a new one)
+  2. Look for peaks in the histogram -> each peak = one phase
+  3. Set thresholds at the valleys between peaks
+  4. For quick check: open a few TIFF slices in ImageJ/Fiji, use the histogram tool
+
+--- 9e. How to get cylinder parameters from Dragonfly ---
+
+  1. Load raw TIFFs in Dragonfly
+  2. Use Dragonfly's crop tool to select the region of interest
+  3. Read crop bounds from Dragonfly's macro log (report.txt / Properties panel)
+  4. Create a cylinder ROI in Dragonfly around the specimen
+  5. Read cylinder cap centers and radius from Dragonfly Properties panel:
+       Cap1 center: (X, Y, Z) in um
+       Cap2 center: (X, Y, Z) in um
+       Radius: um
+  6. Get CT channel origin: run in Dragonfly console:
+       print(ct_channel.getOrigin())   # returns meters, multiply by 1e6 for um
+  7. Enter these values directly in the script as CYL_CAP1_UM, CYL_CAP2_UM, etc.
+     The script automatically converts to cropped voxel coordinates.
+
+--- 9f. Noise removal guidelines ---
+
+  MIN_ICE_VOXELS:   500 works for glass specimen. Increase for noisier data.
+  MIN_GLASS_VOXELS: Keep SMALL (10-50). Real beads can be ~500 voxels.
+                    Setting too high removes real beads!
+  MIN_TRAPPED_AIR_VOXELS: Usually 0 (disabled). Enable to clean air noise.
+
+
+============================
+  10. TROUBLESHOOTING
+============================
+
+--- UnicodeDecodeError on exec() ---
+  Use encoding='utf-8':
+  exec(open(path, encoding='utf-8').read(), globals())
+
+--- ROIs appear but are empty in 2D ---
+  The ROI coordinate system doesn't match the CT channel.
+  MUST use makeROIForChannel(ct_channel, 0, 0, 0) after extraction.
+
+--- ROIs fill the whole screen ---
+  Same coordinate mismatch problem. See above.
+
+--- Beads cut off at top/bottom of specimen ---
+  The cylinder is probably tilted. Use CYL_CAP1_UM and CYL_CAP2_UM
+  with different X values to follow the tilt. The script interpolates
+  the center per Z slice automatically.
+
+--- Glass beads missing from ROI ---
+  MIN_GLASS_VOXELS too high. Real beads can be small (~500 voxels).
+  Lower MIN_GLASS_VOXELS to 10 or 0.
+
+--- Aluminum indistinguishable from glass ---
+  Set T_GLASS_AL = 65536 to merge aluminum into glass.
+  Only separate them if the histogram shows a clear aluminum peak.
+
+--- "import failed" in Step 7 ---
+  Step 7 only works inside Dragonfly's Jupyter console, not standalone Python.
+
+--- CT channel not found ---
+  Make sure the CT dataset is loaded in Dragonfly before running the script.
+  Check that the title search string matches ('Glass-1001800' for glass dataset).
+
+--- getAsROIWithinRange produces empty ROIs ---
+  Check that seg_ch is published (seg_ch.publish() must be called first).
+  Check threshold values are raw integers, not normalized (0-1).
+
+--- Segmentation looks wrong (too much trapped air) ---
+  Step 3b connected component method may need adjustment.
+  The largest air component inside the cylinder = outside air ring.
+  If specimen has a very large internal void, it might be misclassified.
+  Solution: check component sizes, possibly use top-N largest as outside air.
+
+--- _seg_temp_delete_me channel stays in workspace ---
+  deleteObject() or remove() failed. Delete it manually in Dragonfly.
+
+
+============================
+  11. FILES IN THIS DIRECTORY
+============================
+
+  segmentation.py           Main pipeline script (Steps 1-7)
+  histogram_analysis.py     Histogram analysis for threshold determination
+  segmentation_overview.png Overview image of segmentation results
+  RESUME_SESSION.txt        This file
+  report1.txt               Dragonfly macro log (crop, cylinder parameters)
+  segmentation/             Folder with segmentation TIFF stack (seg_0000.tif ...)
+  Glass.ORSSession._ctcsav  Dragonfly session file
+
+================================================================================
+  END OF DOCUMENTATION
+================================================================================

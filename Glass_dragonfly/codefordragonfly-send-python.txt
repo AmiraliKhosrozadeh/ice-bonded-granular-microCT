@@ -1,0 +1,44 @@
+Paste these into Dragonfly's Python console, in order. Each line runs one stage and keeps the variables (seg, specimen_mask, bead_labels, results) alive for the next:          
+                                                                                                                                                                                
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\segmentation.py', encoding='utf-8').read(), globals())                                                                                                                                                                                                                                                 
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\bead_analysis.py', encoding='utf-8').read(), globals())                                                                                                                                                                                                                                              
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\porosity_analysis.py', encoding='utf-8').read(), globals())
+
+  Optional extras (after the three above):
+
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\pipeline_figure.py', encoding='utf-8').read(), globals())
+
+  exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_dragonfly\psd_comparison.py', encoding='utf-8').read(), globals())
+
+  Before running: close any viewer/PowerPoint/OneDrive-sync holding the segmentation TIFFs or result PNGs, otherwise the safe-save guard will throw a PermissionError naming the
+  locked file.
+
+------------------
+  Recommended combo if you think smaller beads at the edges are being missed:
+  MARKER_MIN_DIST = 14
+  MIN_BEAD_VOXELS = 100
+  # in peak_local_max call: threshold_abs=2.0
+
+  Recommended combo if touching beads are being merged into one:
+  MARKER_MIN_DIST = 12       # allow closer markers
+  ERODE_ITERATIONS = 7       # break bridges harder
+
+  Always check bead_markers_check.png after tuning — it overlays markers on the glass mask so you can see whether markers match real bead centers. If you see multiple markers per   bead = over-split (increase MARKER_MIN_DIST). If beads have no markers = under-split (decrease it).
+
+  Want me to change any of these now, or make them command-line/arg-settable?
+ The knobs that control sensitivity (most→least impact):                                                                                                                         
+                                                                                                                                                                                
+  ┌──────────────────────────────────────────────┬─────────┬───────────────────────┬──────────────────────────────────────────────┐                                                 │                  Parameter                   │ Default │    To detect more     │                     Risk                     │
+  ├ MARKER_MIN_DIST                              │ 18      │ lower (e.g. 12–14)    │ over-splits a single bead into pieces                                                          │ MARKER_MIN_DIST                              │ 18      │ lower (e.g. 12–14)    │ over-splits a single bead into pieces        │                                               
+  ├──────────────────────────────────────────────┼─────────┼───────────────────────┼──────────────────────────────────────────────┤                                               
+  │ threshold_abs (in peak_local_max, line ~132) │ 4.0     │ lower (e.g. 2.0)      │ small bumps in noisy ice become fake markers │                                               
+  ├──────────────────────────────────────────────┼─────────┼───────────────────────┼──────────────────────────────────────────────┤                                               
+  │ MIN_BEAD_VOXELS                              │ 200     │ lower (e.g. 100)      │ noise specks get counted as beads            │
+  ├──────────────────────────────────────────────┼─────────┼───────────────────────┼──────────────────────────────────────────────┤
+  │ ERODE_ITERATIONS                             │ 5       │ raise (e.g. 7–8)      │ shrinks beads, tiny ones disappear           │
+  ├──────────────────────────────────────────────┼─────────┼───────────────────────┼──────────────────────────────────────────────┤
+  │ DIST_SMOOTH_SIGMA                            │ 1.0     │ lower (e.g. 0.5 or 0) │ more peaks from noise = over-split           │
+  └──────────────────────────────────────────────┴─────────┴───────────────────────┴──────────────────────────────────────────────┘
+
+-------------------------------------------------------------
+
