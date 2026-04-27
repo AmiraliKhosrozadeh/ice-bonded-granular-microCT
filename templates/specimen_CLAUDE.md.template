@@ -1,0 +1,262 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this specimen is
+
+`<SPECIMEN>` is a new CT specimen in the glass-bead / ice compression
+series. Bead diameter 1700 µm nominal, "T5_HR" = high-roughness glass (same
+material as `<SPECIMEN>`), "75" is the specimen ID. Voxel size
+throughout the series is **24.7660229 µm**.
+
+Three scans are already present (`<SPECIMEN>_01..03/`, slices
+0000–1127 each). This gives **two compression transitions** (1→2 and 2→3) —
+structurally between the T7 pipeline (4 scans, 3 transitions) and the T5_HR
+pipeline (2 scans, 1 transition).
+
+## Sibling specimens — reference implementations (clone, don't rewrite)
+
+- `..\Glass_100_1700_T7\` — smooth-glass baseline, 4 scans / 3 transitions,
+  fully analysed. SPAM pipeline at `Glass_1700_spam\spam_t7_*.py`.
+- `..\<SPECIMEN>\` — high-roughness sibling, 2 scans / 1 transition,
+  fully analysed. Leanest SPAM pipeline at `<SPAM>\spam_*.py` —
+  **this is the right starting point for the 75 specimen**. Extend the
+  `TRANSITIONS = [(1, 2)]` list to `[(1, 2), (2, 3)]`.
+- `..\Glass_spam\`, `..\Glass_dragonfly\`, `..\Glass_scan02_dragonfly\` —
+  first-pass scaffolds (predate the per-specimen refactor). Kept for reference
+  only. Don't re-use.
+
+## Commands
+
+### Dragonfly scripts (per-scan segmentation / bead / porosity / histogram)
+
+Each `scanNN_*.py` is run from **inside Dragonfly's Python console** — they
+call `ORSModel` APIs and need the CT channel to be loaded in the current
+session. The idiom is:
+
+```python
+exec(open(r"E:\RPTU-images\CT_images\Glass\<SPECIMEN>\scan{N}_dragonfly\scan01_segmentation.py",
+          encoding='utf-8').read(), globals())
+```
+
+Run `dragonfly_channel_info.py` first on a fresh session to confirm the
+channel title / origin / spacing, and paste into `scanNN_dragonfly\info.txt`.
+
+### SPAM pipeline (WSL)
+
+SPAM only runs on WSL (Ubuntu 24.04.2, Python 3.12.3, SPAM 0.8.1.5). Windows
+path `E:\...\Glass_spam\data` mounts at `/mnt/e/...`. Every session:
+
+```bash
+source ~/spam-venv/bin/activate     # NOT ~/spam-env — the path in INSTALL.md is stale
+```
+
+Run the pipeline **sequentially** (each step loads ~3 GB — parallel runs
+OOM-kill under WSL). Typical order for this specimen once scripts are cloned:
+
+```bash
+python <spam_dir>/spam_align.py            # pad into common frame
+python <spam_dir>/spam_ddic.py             # per-bead DIC (CLI spam-ddic)
+python <spam_dir>/spam_ldic.py             # grid DIC (CLI spam-ldic)
+python <spam_dir>/spam_ice_bonds.py        # bonds per scan + change
+python <spam_dir>/spam_contacts.py         # glass-glass contact network
+python <spam_dir>/spam_failure_modes.py    # CRUSH/DELAM/COHES + Δdryness
+python <spam_dir>/spam_all_plots.py        # disp/strain/phi_qc/rotation/zdisp
+python <spam_dir>/spam_failure_modes_combined_3d.py
+python <spam_dir>/spam_ldic_viz.py
+python <spam_dir>/spam_summary.py
+python <spam_dir>/spam_roughness_scan01.py
+```
+
+Roughness comparison (add this specimen as a third column in the existing
+T7-vs-T5_HR chart):
+
+```bash
+python ..\<SPECIMEN>\spam_roughness_compare_T7_vs_T5HR.py
+```
+
+## Architecture — where data lives between stages
+
+```
+Raw TIFF slices          <SPECIMEN>_0N\  (0000..1127)
+         |  [Dragonfly session: scan0N_dragonfly\scan0N_segmentation.py]
+         v
+ct_scan0N.tif, specimen_mask_scan0N.tif     -> <spam_dir>\data\
+         |  [Dragonfly: scan0N_bead_analysis.py]
+         v
+bead_labels_scan0N.tif                      -> <spam_dir>\data\
+         |  [WSL: spam_align.py]   (XY from Dragonfly origin, Z from first_slice*voxel)
+         v
+*_aligned.tif   +   data\aligned_meta.py    (common origin / shape / offsets)
+         |  [WSL: ddic, ldic, ice_bonds, contacts, failure_modes, roughness]
+         v
+results_<PRE>\{transition_1to2, transition_2to3}\*.csv + *.png + *.vtk
+```
+
+Two critical constants travel with the data:
+- **`VOXEL_UM = 24.7660229`** — fixed across all specimens.
+- **`SCANS[i].first_slice`** (in `scan_meta.py`) — raw-TIFF slice index of
+  Dragonfly's loaded Z=0. This, NOT Dragonfly's reported `origin_Z`, is what
+  the align script uses for Z stacking. See trap #1 below.
+
+## Recurring traps — do NOT rediscover these
+
+1. **Dragonfly Z-origin trap.** `getOrigin()` returns the correct X/Y
+   (= `(minX − 0.5) × voxel`), but resets Z per channel. For multi-scan
+   alignment, use `first_slice × voxel_um` as the Z reference.
+
+2. **Segmentation slicing is INCLUSIVE.** `X_MAX = X_MIN + N − 1` for a
+   channel of width N. Off-by-one → every re-imported ROI lands shifted.
+
+3. **ROI origin alignment before publish.** Copy the CT channel's origin AND
+   spacing onto the seg/label channel before `publish()`, else ROIs land at
+   world (0, 0, 0):
+   ```python
+   seg_ch.setXSpacing(ct.getXSpacing()); ...; seg_ch.setOrigin(ct.getOrigin())
+   seg_ch.publish()
+   ```
+
+4. **Voxel index from origin:** `minX = round(origin_X / voxel + 0.5)` (not
+   `floor` — Dragonfly origin sits at voxel-center).
+
+5. **No aluminum peak in the histogram?** Set `T_GLASS_AL = 99999`. Otherwise
+   the Al-first subtraction treats bright bead centres (beam-hardening) as
+   aluminum, dilates 10 vox, and carves holes around every bead.
+
+6. **`CT_CHANNEL_NAME`** must match Dragonfly's *displayed* title. Dragonfly
+   sometimes strips `-scan2-` from the prefix. Always verify with
+   `dragonfly_channel_info.py`.
+
+7. **No `-lazy` flag with `spam-ddic` / `spam-ldic`.** The alignment script
+   writes zlib-compressed TIFFs; lazy mode tries `tifffile.memmap` and fails
+   with "Problem with tifffile.memmap".
+
+8. **Heavy compression (>25% axial) needs `CENTROID_TOL = 150` voxels** in
+   `ice_bonds`, `contacts`, and `failure_modes` label-map builders (default
+   50 drops most matches).
+
+9. **Run SPAM steps SEQUENTIALLY.** Each loads ~3 GB of aligned TIFFs;
+   parallel runs OOM-kill (exit 15) on the stock WSL VM.
+
+10. **DDIC label map must be injective.** Two scan-A beads mapping to the
+    same scan-B bead break downstream — drop all but the closest scan-A
+    match per scan-B label. Self-overlap otherwise inflates CRUSH counts.
+
+11. **Driving SPAM DDIC/LDIC.** Use the **CLI** (`spam-ddic`, `spam-ldic`)
+    via `subprocess.run(...)`, not the Python API — the `spam.DIC.ddic`
+    signature differs. Phi seed is a 1-row TSV, 20 cols
+    (`NodeNumber..deltaPhiNorm`), `Fzz = h_B / h_A` from specimen-mask
+    Z-extents, node at volume centre.
+
+## Failure-mode classification (the algorithm that works)
+
+Two complementary signals produced by `spam_*_failure_modes.py`:
+
+**Bond-level, volume-based in the DEFORMED scan B** (`INTER_REACH = 5` vox):
+```
+zone      = dilate(mA, INTER_REACH) ∧ dilate(mB, INTER_REACH)
+inter     = zone ∧ ¬mA ∧ ¬mB
+V_air     = (inter ∧ air).sum()
+V_ice     = (inter ∧ ice).sum()
+V_contact = (mA ∧ dilate(mB, 1)).sum()
+```
+1. `f_crush = V_contact / (V_air+V_ice+V_contact) ≥ 0.80` → CRUSHED
+2. `V_air + V_ice < 20` with `V_contact > 0` → CRUSHED
+3. else `f_delam = V_air / (V_air + V_ice)`: ≥ 0.70 DELAM, ≤ 0.30 COHESIVE,
+   else MIXED
+4. no neighbours at all → UNCLEAR
+
+**Per-bead Δdryness** (direct delamination metric):
+```
+dryness[L] = air_adj[L] / (air_adj[L] + ice_adj[L])
+Δ          = dryness_B − dryness_A
+```
+`> 0.30` strong delam, `0.10–0.30` mild, `|Δ| ≤ 0.10` stable, `< −0.10`
+re-bonded.
+
+## Key prior finding (T7 smooth vs T5_HR rough, one compression step each)
+
+Increased bead roughness **eliminated** delamination (0 of 85 tracked beads
+vs 1 strong + 7 mild for T7) and shifted failure from CRUSHED (262 bonds) to
+COHESIVE ice fracture (3 bonds). Full report:
+`..\<SPECIMEN>\results_compare_T7_vs_T5HR\delamination_comparison.txt`.
+Voxel-size caveat: Ra below ~12 µm is resolution-noise; CT detects HR
+through this mechanical fingerprint, not sub-voxel texture directly.
+
+## Plot-style defaults (apply to every matplotlib figure, don't ask)
+
+```python
+plt.rcParams.update({
+    "font.size": _FS, "axes.titlesize": _FS,
+    "axes.labelsize": _FS + 2,          # LARGER than base
+    "xtick.labelsize": _FS - 2, "ytick.labelsize": _FS - 2,
+    "legend.fontsize": _FS - 2, "axes.linewidth": 1.8,
+    "figure.facecolor": "white", "axes.facecolor": "white",
+})
+fig.legend(..., bbox_to_anchor=(0.5, -0.14))    # push legend DOWN, no overlap
+fig.savefig(path, dpi=150, bbox_inches='tight')
+```
+
+PyVista: use `viewup = (0, 0, -1)` (Dragonfly's Z is positive-down).
+
+## Dragonfly 2025.1 Python API — confirmed patterns
+
+```python
+from ORSModel import createChannelFromNumpyArray, ROI, orsColor, Channel
+
+# Find channels — use getTitle(), NOT getName() (returns UUID)
+for ch in Channel.getAllObjectsOfClass(Channel.getClassNameStatic()):
+    title = ch.getTitle()
+
+# Phase ROI (few objects)
+seg_ch = createChannelFromNumpyArray(arr.astype(np.uint8))
+seg_ch.setOrigin(ct_channel.getOrigin()); seg_ch.publish()     # needed for ROIs to land on the specimen
+roi_tmp = ROI(); roi_tmp.copyShapeFromStructuredGrid(seg_ch)
+seg_ch.getAsROIWithinRange(vmin, vmax, None, roi_tmp)
+roi_ct = roi_tmp.makeROIForChannel(ct_channel, 0, 0, 0); roi_ct.publish()
+
+# MultiROI (beads — many objects)
+label_ch = createChannelFromNumpyArray(bead_labels.astype(np.uint16))
+label_ch.setXSpacing(ct.getXSpacing()); ...; label_ch.setOrigin(ct.getOrigin())
+label_ch.publish()
+multi_roi = label_ch.getAsMultiROI(None, None)
+multi_roi.assignDefaultColors()      # otherwise every label renders black
+multi_roi.setTitle('beads'); multi_roi.publish()
+label_ch.deleteObject()              # cleanup
+
+# Delete: obj.deleteObject()  (NOT remove())
+```
+
+Methods that do **not** exist: `ROI.getArray()`, `ROI.show()`,
+`WorkingContext.getCurrentWorkingContext()`, `Channel.getName()` (returns
+UUID, not title), `spam.__version__` (use `pip show spam`).
+
+## Opening checklist for this specimen
+
+1. List raw-TIFF ranges in `<SPECIMEN>_0N\` (already: 0000..1127 × 3).
+2. Load scan 1 in Dragonfly → run `dragonfly_channel_info.py` → save to
+   `scan{N}_dragonfly\info.txt`. Same for scans 2 and 3.
+3. Histogram per scan → pick `T_AIR_ICE`, `T_ICE_GLASS`, `T_GLASS_AL`.
+4. Copy the T5_HR `scanNN_*.py` scripts, update paths, set cylinder caps from
+   Dragonfly, run segmentation + bead analysis per scan.
+5. Clone `<SPAM>\` wholesale to e.g. `<SPAM>\`; update
+   `scan_meta.py` (origin_um + first_slice for scans 1/2/3); change
+   `TRANSITIONS = [(1, 2)]` to `[(1, 2), (2, 3)]` in every `spam_*.py`.
+6. Run the SPAM pipeline in the order shown under Commands.
+7. Roughness: run `spam_t7_roughness_scan01.py` against this specimen's
+   `bead_labels_scan01_aligned.tif`, then extend
+   `spam_roughness_compare_T7_vs_T5HR.py` to a three-column comparison.
+
+
+## Microstructure analysis (added 2026-04-26)
+
+A new SPAM step `spam_<tag>_microstructure.py` runs after roughness_scan01.
+It computes per-scan PuMA-style metrics (phase fractions, SSA, percolation,
+MIL, fabric tensor, S2(r), geodesic tortuosity, effective thermal conductivity)
+without the NASA-PuMA install. Outputs go to `results_<tag>/microstructure/`.
+
+```bash
+python spam_<tag>_microstructure.py     # run after roughness_scan01
+```
+
+See `E:\RPTU-images\CT_images\NEW_SPECIMEN_PROCEDURE.txt` Appendix 0 for details.

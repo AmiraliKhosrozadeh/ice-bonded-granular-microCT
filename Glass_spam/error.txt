@@ -1,7 +1,0 @@
-exec(open(r'E:\RPTU-images\CT_images\Glass\Glass_spam\spam_export.py', encoding='utf-8').read(), globals())
-  Saved: E:\RPTU-images\CT_images\Glass\Glass_spam\data\ct_scan01.tif  shape=(864, 587, 578)  dtype=uint16  (586.4 MB)
-  Saved: E:\RPTU-images\CT_images\Glass\Glass_spam\data\specimen_mask_scan01.tif  shape=(864, 587, 578)  dtype=uint8  (293.3 MB)
-  Saved: E:\RPTU-images\CT_images\Glass\Glass_spam\data\bead_labels_scan01.tif  shape=(864, 587, 578)  dtype=uint16  (586.4 MB)
-
-Scan 1 TIFFs for SPAM are staged in:
-  E:\RPTU-images\CT_images\Glass\Glass_spam\data
