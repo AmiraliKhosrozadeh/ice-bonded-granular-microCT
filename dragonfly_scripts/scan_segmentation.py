@@ -37,6 +37,23 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy import ndimage
 
+
+def label_counts(label_image):
+    """Return (label_ids, counts) for nonzero labels without using bincount."""
+    labels = label_image[label_image != 0]
+    if labels.size == 0:
+        return np.empty(0, dtype=labels.dtype), np.empty(0, dtype=np.int64)
+
+    labels = labels.astype(np.int64, copy=True)
+    labels.sort()
+    changes = np.empty(labels.shape, dtype=bool)
+    changes[0] = True
+    changes[1:] = labels[1:] != labels[:-1]
+    unique_labels = labels[changes]
+    change_idx = np.flatnonzero(changes)
+    counts = np.diff(np.concatenate((change_idx, [labels.size])))
+    return unique_labels, counts
+
 # -- Settings (SCAN 1 — T5_HR 1700 µm high-roughness experiment) -------------
 # Raw stack: 1432 slices. Dragonfly channel (from info.txt) shape XYZ =
 # (612, 613, 1006), loaded starting at raw slice 0235.
@@ -44,19 +61,19 @@ from scipy import ndimage
 # are the last voxel to include). So for channel X voxels wide we need
 # X_MAX = X_MIN + X - 1. A 1-voxel miscount makes Python's volume a voxel
 # larger than the channel and shifts every ROI imported back into Dragonfly.
-FIRST_SLICE = 80      # first loaded slice (inclusive) — channel title ends in _xy_0080
-LAST_SLICE  = 1026    # last loaded slice (inclusive)  80..1026 = 947 slices
+FIRST_SLICE = 200       # first loaded slice (inclusive) — channel title ends in _xy_0000
+LAST_SLICE  = 1313    # last loaded slice (inclusive)  0..1431 = 1432 slices
 
-TIFF_DIR    = r'E:\RPTU-images\CT_images\Glass\<SPECIMEN>\<SPECIMEN>_01'
-FILE_PREFIX = 'Glass-75-1700-T5-HR_100XXL_uc_xy_'
+TIFF_DIR    = r'C:\Users\Lennard\Desktop\Data_Work_Part\alumina\Alumina_75_1000_T5\Alumina_75_1000_T5_01'
+FILE_PREFIX = 'Alumina-75-1000-T5_100XXL_uc_xy_'
 
 # X/Y crop — matches the Dragonfly createDatasetFromFiles crop. Dragonfly
 # reports origin at voxel CENTER, so voxel index = round(origin/voxel + 0.5).
 # For scan 1 origin (10934.189, 1102.087) / 24.7660229 = (441.52, 44.50) ->
 # Dragonfly minX = 442, minY = 45.
 # Getting this off by one shifts every ROI by one voxel.
-X_MIN, X_MAX = 576, 1183   # 608 voxels wide; round(14252.833 / 24.7660 + 0.5) = 576
-Y_MIN, Y_MAX = 177,  784   # 608 voxels tall; round(4371.199  / 24.7660 + 0.5) = 177
+X_MIN, X_MAX = 1, 153   # 608 voxels wide; round(14252.833 / 24.7660 + 0.5) = 576
+Y_MIN, Y_MAX = 1, 146   # 608 voxels tall; round(4371.199  / 24.7660 + 0.5) = 177
 
 VOXEL_SIZE_UM = 24.7660229   # um per voxel (isotropic)
 
@@ -67,7 +84,7 @@ VOXEL_SIZE_UM = 24.7660229   # um per voxel (isotropic)
 #              leaking outside the specimen; the contour tightens the mask
 #              to the actual ice+glass boundary on each slice.
 # 'cylinder' : user-defined tilted cylinder only (no contour refinement).
-MASK_METHOD = 'cylinder'   # user draws cylinder inside specimen; no contour tightening needed
+MASK_METHOD = 'contour'   # user draws cylinder inside specimen; no contour tightening needed
 
 # Otsu-based ice/air threshold (inside specimen). The paper (Section 3.5.6.1)
 # found that Otsu systematically overestimates the air content and preferred
@@ -130,11 +147,11 @@ CYL_CAP1_VOX = tuple(f - s for f, s in zip(_c1_full, CROP_OFFSET_VOX))
 CYL_CAP2_VOX = tuple(f - s for f, s in zip(_c2_full, CROP_OFFSET_VOX))
 CYL_RADIUS_VOX = (CYL_RADIUS_UM + CYL_RADIUS_MARGIN_UM) / VOXEL_SIZE_UM
 
-OUT_DIR = r'E:\RPTU-images\CT_images\Glass\<SPECIMEN>\\scan{N}_dragonfly\segmentation'
+OUT_DIR = r'C:\Users\Lennard\Desktop\Data_Work_Part\alumina\Alumina_75_1000_T5\\scan{N}_dragonfly\segmentation'
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # Dragonfly CT channel search string (for Step 7 ROI creation)
-CT_CHANNEL_NAME = 'Glass-75-1700-T5-HR_100XXL_uc_xy_'  # prefix-only; matches any loaded slice index
+CT_CHANNEL_NAME = 'Alumina-75-1000-T5_100XXL_uc_xy_'  # prefix-only; matches any loaded slice index
 
 # Median filter size for noise reduction (0 = skip)
 MEDIAN_SIZE = 3
@@ -553,18 +570,17 @@ if MIN_ICE_VOXELS > 0:
     ice_mask = (seg == LABEL_ICE)
     n_ice_before = int(np.sum(ice_mask))
     ice_labeled, n_ice_comp = ndimage.label(ice_mask)
-    ice_sizes = np.bincount(ice_labeled.ravel())
-    ice_sizes[0] = 0   # background
+    try:
+        ice_labels, ice_sizes = label_counts(ice_labeled)
+    except MemoryError:
+        print('  WARNING: MemoryError counting ice components; skipping ice small-object removal.')
+        ice_labels = np.empty(0, dtype=np.int64)
+        ice_sizes = np.empty(0, dtype=np.int64)
 
-    # Find small components
-    small_ice = np.zeros(len(ice_sizes), dtype=bool)
-    for i in range(1, len(ice_sizes)):
-        if ice_sizes[i] < MIN_ICE_VOXELS:
-            small_ice[i] = True
-
-    n_removed_comp = int(np.sum(small_ice))
+    small_ice_ids = ice_labels[ice_sizes < MIN_ICE_VOXELS]
+    n_removed_comp = int(len(small_ice_ids))
     # Build mask of all small-component voxels
-    remove_mask = small_ice[ice_labeled]
+    remove_mask = np.isin(ice_labeled, small_ice_ids)
     n_removed_vox = int(np.sum(remove_mask))
 
     # Reclassify removed voxels: set to glass (most likely surrounding phase)
@@ -580,16 +596,16 @@ if MIN_GLASS_VOXELS > 0:
     glass_mask = (seg == LABEL_GLASS)
     n_glass_before = int(np.sum(glass_mask))
     glass_labeled, n_glass_comp = ndimage.label(glass_mask)
-    glass_sizes = np.bincount(glass_labeled.ravel())
-    glass_sizes[0] = 0
+    try:
+        glass_labels, glass_sizes = label_counts(glass_labeled)
+    except MemoryError:
+        print('  WARNING: MemoryError counting glass components; skipping glass small-object removal.')
+        glass_labels = np.empty(0, dtype=np.int64)
+        glass_sizes = np.empty(0, dtype=np.int64)
 
-    small_glass = np.zeros(len(glass_sizes), dtype=bool)
-    for i in range(1, len(glass_sizes)):
-        if glass_sizes[i] < MIN_GLASS_VOXELS:
-            small_glass[i] = True
-
-    n_removed_glass_comp = int(np.sum(small_glass))
-    remove_glass_mask = small_glass[glass_labeled]
+    small_glass_ids = glass_labels[glass_sizes < MIN_GLASS_VOXELS]
+    n_removed_glass_comp = int(len(small_glass_ids))
+    remove_glass_mask = np.isin(glass_labeled, small_glass_ids)
     n_removed_glass_vox = int(np.sum(remove_glass_mask))
 
     # Reclassify removed glass voxels as ice (most likely surrounding phase)
@@ -604,16 +620,16 @@ if MIN_TRAPPED_AIR_VOXELS > 0:
     ta_mask = (seg == LABEL_TRAPPED_AIR)
     n_ta_before = int(np.sum(ta_mask))
     ta_labeled, n_ta_comp = ndimage.label(ta_mask)
-    ta_sizes = np.bincount(ta_labeled.ravel())
-    ta_sizes[0] = 0
+    try:
+        ta_labels, ta_sizes = label_counts(ta_labeled)
+    except MemoryError:
+        print('  WARNING: MemoryError counting trapped-air components; skipping trapped-air small-object removal.')
+        ta_labels = np.empty(0, dtype=np.int64)
+        ta_sizes = np.empty(0, dtype=np.int64)
 
-    small_ta = np.zeros(len(ta_sizes), dtype=bool)
-    for i in range(1, len(ta_sizes)):
-        if ta_sizes[i] < MIN_TRAPPED_AIR_VOXELS:
-            small_ta[i] = True
-
-    n_removed_ta_comp = int(np.sum(small_ta))
-    remove_ta_mask = small_ta[ta_labeled]
+    small_ta_ids = ta_labels[ta_sizes < MIN_TRAPPED_AIR_VOXELS]
+    n_removed_ta_comp = int(len(small_ta_ids))
+    remove_ta_mask = np.isin(ta_labeled, small_ta_ids)
     n_removed_ta_vox = int(np.sum(remove_ta_mask))
     seg[remove_ta_mask] = LABEL_ICE   # small air pockets inside ice -> reclassify as ice
 
@@ -775,7 +791,7 @@ results_dir = os.path.join(os.path.dirname(OUT_DIR), 'results')
 os.makedirs(results_dir, exist_ok=True)
 overview_path = os.path.join(results_dir, 'segmentation_overview.png')
 import sys as _sys
-_sys.path.insert(0, r'E:\RPTU-images\CT_images\Glass\<SPECIMEN>\\scan{N}_dragonfly')
+_sys.path.insert(0, os.path.dirname(os.path.abspath(r'C:\Users\Lennard\Micro-CT\dragonfly_scripts\scan_segmentation.py')))
 from plot_style import save_fig as _save_fig
 _save_fig(fig, overview_path)
 plt.rcdefaults()
@@ -1015,7 +1031,7 @@ except Exception as e:
 # -- 8. Export volumes for SPAM (scan 2) --------------------------------------
 # Write ct_scan01.tif and specimen_mask_scan01.tif into Glass_spam\data\ so the
 # WSL-side SPAM pipeline can consume them without re-reading the raw stack.
-SPAM_DATA_DIR = r'E:\RPTU-images\CT_images\Glass\<SPECIMEN>\<SPAM>\data'
+SPAM_DATA_DIR = os.path.join(os.path.dirname(OUT_DIR), 'data')
 os.makedirs(SPAM_DATA_DIR, exist_ok=True)
 print(f"\nStep 8: Exporting TIFFs for SPAM to {SPAM_DATA_DIR}")
 try:
