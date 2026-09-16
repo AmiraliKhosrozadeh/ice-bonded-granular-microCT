@@ -1,0 +1,167 @@
+%% Supplementary material.  Compiled on its own (latexmk -pdf supplementary.tex);
+%% the figure sheets and table bodies in supplementary/ are made by
+%% scripts/fig_crack3d_supp.py, fig_crackdir_supp.py, fig_tau_geodesic.py and
+%% supp_tables.py.
+\documentclass[preprint,12pt]{elsarticle}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{url}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thesection}{S\arabic{section}}
+
+\begin{document}
+\begin{frontmatter}
+  \title{Supplementary material to\\Grain-scale kinematics, ice-bond failure
+    and damage evolution in ice-bonded granular media under in-situ uniaxial
+    compression}
+  \author{Amirali Khosrozadeh, Yannik Sinnwell, Swantje Pietsch-Braune, Kai
+    Nikolaus, Sergiy Antonyuk, Stefan Heinrich}
+\end{frontmatter}
+
+The analysis code and the tables reproduced here are at
+\url{https://github.com/AmiraliKhosrozadeh/ice-bonded-granular-microCT}.
+Specimen labels, load-step numbering and the axial convention (punch at the
+top) are those of the paper.
+
+\section{Method settings and provenance}
+Table~\ref{tab:settings} lists, for each analysis of the paper, what it
+takes in, what it returns, the software that performs it and the settings
+that fix the result.  Every entry not attributed to a package is the
+authors' own code.
+
+\input{supplementary/settings_table.tex}
+
+\section{Void and crack classes in every bead specimen}
+Figures~\ref{fig:crack_glass} and \ref{fig:crack_alumina} give the classes
+of \S2.5.2 of the paper (void, surface crack, body crack inside the bead
+envelope) at every scan of every bead specimen, in the rendering of Fig.~11
+of the paper.  Table~\ref{tab:crack} gives the volumes.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth]{supplementary/crack3d_glass.png}
+  \caption{Void and crack classes at every scan of the glass specimens.}
+  \label{fig:crack_glass}
+\end{figure}
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth]{supplementary/crack3d_alumina.png}
+  \caption{Void and crack classes at every scan of the $\gamma$-alumina specimens.}
+  \label{fig:crack_alumina}
+\end{figure}
+
+\begin{table}[p]
+  \centering
+  \caption{Volumes of the classes inside the bead envelope at every scan.
+    The unloaded scan is the baseline of each specimen; the floor of a
+    change is set by A4's first increment (see the paper).}
+  \label{tab:crack}
+  \footnotesize
+  \input{supplementary/tab_crack.tex}
+\end{table}
+
+\section{Crack orientation in every bead specimen}
+The pipeline's body-crack components with their fitted planes, in the
+rendering of Fig.~12 of the paper, for every loaded scan
+(Figs.~\ref{fig:dir_glass} and \ref{fig:dir_alumina}).  These renders use
+the pipeline's per-scan specimen mask, whose boundary artefact the paper
+describes in \S2.5.2; the fitted orientations are read as the principal
+direction of a damage zone, not as fracture planes.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth]{supplementary/crackdir_glass.png}
+  \caption{Crack orientation classes of the glass specimens.}
+  \label{fig:dir_glass}
+\end{figure}
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth]{supplementary/crackdir_alumina.png}
+  \caption{Crack orientation classes of the $\gamma$-alumina specimens.}
+  \label{fig:dir_alumina}
+\end{figure}
+
+\section{Ice-path maps of every specimen}
+Figures~\ref{fig:tau_glass}--\ref{fig:tau_sand} give the map of Fig.~18 of
+the paper for every specimen: ice whose geodesic path from the support is
+at least $8\%$ longer than in the unloaded column at the same height is
+drawn solid and coloured, the remaining ice as a faint shell.  The map is
+computed on the $2\times$-binned phase maps used for the diffusion solve,
+inside the grain envelope, on the largest 26-connected ice body, seeded
+from a \SI{1}{\milli\meter} slab at the support face with the
+\SI{4}{\milli\meter} next to the seed cut.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth]{supplementary/tau_geodesic_glass.png}
+  \caption{Ice-path maps of the glass specimens.}
+  \label{fig:tau_glass}
+\end{figure}
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth]{supplementary/tau_geodesic_alumina.png}
+  \caption{Ice-path maps of the $\gamma$-alumina specimens.}
+  \label{fig:tau_alumina}
+\end{figure}
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=\linewidth]{supplementary/tau_geodesic_sand.png}
+  \caption{Ice-path maps of the sand specimens.}
+  \label{fig:tau_sand}
+\end{figure}
+
+\section{Per-specimen tables}
+
+\begin{table}[p]
+  \centering
+  \caption{Ice tortuosity of every scan from the PuMA continuum diffusion
+    solve, mean and standard deviation over the accepted $128^3$-voxel
+    cubes, with the ice fraction of the cubes and the number accepted of
+    those attempted.}
+  \label{tab:tau}
+  \footnotesize
+  \input{supplementary/tab_tau.tex}
+\end{table}
+
+\begin{table}[p]
+  \centering
+  \caption{Kinematics of every composed field, on the grains carried through
+    the whole chain: median relative displacement with the rigid motion of
+    the column removed, the rigid rotation of the column, the median and 95th
+    percentile of the local rotation, and of the equivalent strain.}
+  \label{tab:kin}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \input{supplementary/tab_kin.tex}
+\end{table}
+
+\begin{table}[p]
+  \centering
+  \caption{Failure-mode census of every bead specimen at each coverage
+    threshold, cohesive/adhesive, with the number of answerable throats, the
+    median gap of those throats and the median share of the throat crack
+    lying against a grain face.}
+  \label{tab:fm}
+  \footnotesize
+  \input{supplementary/tab_fm.tex}
+\end{table}
+
+\begin{table}[p]
+  \centering
+  \caption{Breakage-event clustering sweep of every bead specimen: at each
+    neighbourhood radius (in grain diameters) the number of DBSCAN clusters,
+    the largest cluster and the smallest RMS out-of-plane distance of a
+    cluster, each against the median of 400 resamplings of the bonds present
+    and the resampling $p$.  The pre-specified radius is $1.0$.}
+  \label{tab:cluster}
+  \scriptsize
+  \input{supplementary/tab_cluster.tex}
+\end{table}
+
+\end{document}

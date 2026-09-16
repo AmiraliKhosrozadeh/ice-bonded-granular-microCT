@@ -1,90 +1,83 @@
-# Micro-CT pipeline for granular ice / glass-bead / alumina specimens
+# Grain-scale kinematics, ice-bond failure and damage evolution in ice-bonded granular media under in-situ uniaxial compression
 
-End-to-end image-processing and post-processing pipeline used to analyse
-in-situ compression CT scans of ice-bonded glass-bead and alumina-bead
-specimens. Same pipeline is applied to every specimen; only a small set
-of per-specimen tunables (scan list, alignment shape, intensity
-thresholds) changes from one specimen to the next.
+Analysis code, per-specimen tables and supplementary material for the paper of
+that title (Khosrozadeh et al., submitted to *Powder Technology*).  Twelve
+ice-bonded columns, five of glass beads (G1–G5), four of γ-alumina beads
+(A1–A4) and three of quartz sand (S1–S3), were compressed at −5 °C inside a
+laboratory micro-CT and reconstructed at every load step at 24.77 µm per
+voxel.  The reconstructions themselves are available from the corresponding
+author on request; everything computed from them is here.
 
-## Folder structure
+The repository is organised by what each analysis takes in, which is how
+Fig. 1 of the paper draws it.
 
 ```
-dragonfly_scripts/        Run inside Dragonfly (Python console).
-                          Per-scan segmentation, bead labelling,
-                          histogram / porosity / PSD analysis,
-                          ROI -> TIFF export, optional PuMA driver.
+stage0_dragonfly/        per-scan segmentation run inside Dragonfly: phase classification,
+                         watershed bead labels, histogram / porosity / PSD checks, ROI export
+spam_pipeline/           first-generation SPAM pipeline (alignment, ddic, ldic, contacts,
+                         bonds, crack analysis, tortuosity, plots) as first written; the
+                         paper's numbers come from analysis/ and paper/, which supersede it
+postprocessing/          first-generation post-processing (sparse graphs, permeability)
 
-spam_pipeline/            Run from WSL (SPAM virtualenv).
-                          Alignment, ddic / ldic registration,
-                          bead-bond detection, contact analysis,
-                          failure-mode / crack / tortuosity / FFT
-                          elasticity, plotting and STL export.
+analysis/                the pipeline the paper reports, one folder per branch of Fig. 1
+  kinematics/            branch A: bead DDIC (spam-ddic), composed 1->N fields, neighbourhood
+                         gradient, Green-Lagrange strain, packing rotation, motion renders
+  sand_tracking/         branch A for sand: predictor from column length, reciprocal
+                         matching, grain strain, damage criteria and their nulls
+  bonds/                 branch B: throat lens, neck, coverage pair, cohesive / adhesive
+                         classification, survival census, breakage clustering null test;
+                         _spec.py is the registry of every specimen's scans, frames and
+                         thresholds that the other scripts import
+  damage/                branch C: the pipeline's void / crack / separation classes and the
+                         crack-orientation classification (the volumes the paper reports
+                         come from paper/scripts/crack_split_tight.py, see below)
+  structure/             branches C and D: fixed core, phase fractions, voxel-face specific
+                         surface, 26-connected spanning air, Kozeny-Carman estimate, PuMA
+                         ice-diffusion tortuosity
+  sand_segmentation/     phase segmentation of the sand and, under dl/, the border-core 3D
+                         U-Net (synthetic training data, training, inference, decoding) with
+                         the five-way comparison against watershed, ParticleSeg3D and
+                         Cellpose-SAM
 
-postprocessing/           Run from WSL.  Newer methods built on top of
-                          the SPAM outputs:
-                            permeability (Kozeny-Carman),
-                            ball-and-bar sparse-graph rendering for
-                            cracks / bonds / ice skeleton,
-                            CT-vs-damage validation panels,
-                            DBSCAN-style crack-path tracing,
-                            density-vacancy crack detection.
-
-templates/                Per-specimen CLAUDE.md template documenting
-                          how to adapt scripts to a new specimen.
-
-POSTPROCESSING_PIPELINE.md
-                          Master pipeline document: prerequisites,
-                          per-specimen tunables, ready-to-paste WSL
-                          command list, outputs summary.
+paper/
+  scripts/               the scripts that make every table and figure of the paper from the
+                         outputs of analysis/; in particular
+                           crack_split_tight.py   void / crack / separation inside the bead
+                                                  envelope, the classes the paper reports
+                           planar_test.py         breakage-clustering null test
+                           ice_tortuosity.py      PuMA continuum diffusion on interior cubes
+                           specimen_tables.py     Tables 2-4 of the paper
+                           fig_*.py               the figures
+  data/                  the tables behind the paper: bond geometry, failure mode at every
+                         threshold, survival census, specimen summary, crack volumes, core
+                         structure, ice tortuosity per cube, DIC summary, clustering sweeps,
+                         loading rates, and under bonds/ the per-throat, per-pair and
+                         per-bead tables of every bead specimen
+supplementary/           supplementary.pdf and its figures: method settings and provenance,
+                         crack classes, crack orientation and ice-path maps for every scan
+templates/               per-specimen template documenting how the scripts are adapted
 ```
 
-## Generic placeholders
+## Software
 
-Scripts use these placeholders instead of hard-coded specimen names so
-they apply to any specimen:
+SPAM 0.9 (`spam-ddic`), pumapy 3.2.2, scikit-image, scikit-learn, scipy,
+PyVista for the renders, PyTorch for the U-Net.  Paths at the top of each
+script point at the reconstruction folders of the authors' machine.  Run the
+WSL stages sequentially; each loads several GB of aligned TIFFs.
 
-| placeholder      | meaning                                         | example value              |
-|------------------|-------------------------------------------------|----------------------------|
-| `<SPECIMEN>`     | full specimen folder name                       | `Glass_75_1700_T5_HR`      |
-| `<SPAM>`         | spam sub-folder under the specimen              | `Glass_75_spam`            |
-| `<PRE>`          | short prefix used in script / output names      | `75`, `t5hr`, `100_1800_T5`|
-| `scan{N}`        | per-scan placeholder                            | `scan1`, `scan2`, ...      |
+## Method settings
 
-When deploying these scripts to a new specimen, search & replace these
-tokens (or use `_deploy_postprocessing_to_specimens.py` from the parent
-project as a starting point). The substitutions are also documented in
-the per-script header comments.
+`supplementary/supplementary.pdf`, Table S1, lists for every analysis its
+input, output, software and the settings that fix the result.
 
-## Per-specimen tunables (set at the top of each script)
+## What is not here
 
-```python
-SCANS        = [1, 2, 3]            # actual scan list for this specimen
-TRANSITIONS  = [(1, 2), (2, 3)]     # consecutive scan pairs
-NX_E, NY_E, NZ_E = 803, 707, 1241   # aligned-frame shape from <SPAM>/data/aligned_meta.py
-TH = {                              # per-scan intensity thresholds
-    1: dict(air=..., ig=..., ga=...),
-    ...
-}
-```
+The reconstructions (`*.tif` stacks), the aligned and intermediate volumes and
+the per-specimen result folders.  Only the code and the tables and figures
+derived from them are versioned.
 
-`POSTPROCESSING_PIPELINE.md` lists the specimens this pipeline has been
-applied to, with their prefixes, scan counts and spam-folder names.
+## Citation
 
-## Running the pipeline
-
-1. Stage 1 (Dragonfly, per scan) — open the scan session and run the
-   per-scan segmentation script, then the ROI export.
-2. Stage 2 (WSL) — run the SPAM pipeline scripts in the order listed in
-   `POSTPROCESSING_PIPELINE.md`, then the post-processing scripts.
-
-Run the WSL stages **sequentially** — each one loads several GB of
-aligned TIFFs and parallel runs OOM-kill the WSL VM.
-
-## What's NOT in this repo
-
-- Raw CT data (`*.tif`, `*.tiff`, `*.rek`, scanner `*.PRM` files).
-- Aligned and intermediate TIFF stacks.
-- Per-specimen results folders (`results_*`, `*.png`, `*.csv` outputs).
-
-The repo contains the pipeline only; the data lives outside it. See
-`.gitignore` for the full exclusion list.
+Khosrozadeh A., Sinnwell Y., Pietsch-Braune S., Nikolaus K., Antonyuk S.,
+Heinrich S.  Grain-scale kinematics, ice-bond failure and damage evolution in
+ice-bonded granular media under in-situ uniaxial compression.  Submitted.

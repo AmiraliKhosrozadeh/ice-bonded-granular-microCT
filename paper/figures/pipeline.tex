@@ -1,0 +1,132 @@
+% Study pipeline.  Stages 1 and 2 are what was prepared and imaged; stage 3
+% is the analysis drawn by what each branch takes in and what it puts out,
+% with the software named where a package was used and "custom" where the
+% calculation is the authors' own; stage 4 is the measured outputs.  The
+% null references are drawn as a row of their own, one per branch, because
+% each branch is calibrated against a different one and none of them is a
+% repeated unloaded scan.
+% Narrow boxes hyphenate badly, so hyphenation is switched off for the picture.
+\hyphenpenalty=10000 \exhyphenpenalty=10000 \relax
+\begin{tikzpicture}[
+    font=\footnotesize,
+    stage/.style={rectangle, rounded corners=2.5pt, draw=black!45,
+                  fill=white, align=center, inner sep=4pt,
+                  text width=#1, minimum height=8mm},
+    inp/.style={rectangle, rounded corners=2.5pt, draw=black!45,
+                fill=black!4, align=center, inner sep=3pt,
+                text width=#1, minimum height=14mm},
+    ana/.style={rectangle, rounded corners=2.5pt, draw=black!45,
+                fill=white, align=center, inner sep=3.5pt,
+                text width=#1, minimum height=42mm},
+    ctrl/.style={rectangle, rounded corners=2.5pt, draw=red!55, dashed,
+                 fill=red!6, align=center, inner sep=3pt, text width=#1,
+                 minimum height=17mm},
+    grp/.style={rectangle, rounded corners=4pt, draw=#1, line width=0.9pt,
+                fill=#1!8, inner sep=5mm},
+    tag/.style={anchor=south west, font=\small\bfseries, text=#1},
+    ar/.style={-{Latex[length=2mm]}, draw=black!65, line width=0.5pt},
+  ]
+
+  \def\W{150mm}
+  \def\B{34mm}
+
+  % ---- 1. preparation -------------------------------------------------------
+  \node[stage=\W] (mat) at (0,0)
+    {Three granular materials, spherical soda-lime glass, angular
+     $\gamma$-alumina and natural quartz sand, frozen into ice-bonded columns;
+     the ice content of each is measured from its reconstruction};
+
+  % ---- 2. apparatus and acquisition ----------------------------------------
+  \node[stage=\W, below=21mm of mat] (rig)
+    {In-situ cryogenic compression cell at $-5.0\pm0.3\,^\circ$C; the piston
+     advances at a set rate to a force target and holds while the specimen is
+     imaged, then advances to the next target};
+  \node[stage=\W, below=4mm of rig] (ct)
+    {Micro-CT at every load step, \SI{24.77}{\micro\meter} voxel, the same
+     specimen re-imaged at each};
+
+  % ---- 3. analysis ----------------------------------------------------------
+  \node[stage=\W, below=21mm of ct] (pre)
+    {Median filter; three-phase classification into air, ice and grain;
+     grain labels by watershed (beads) or 3D U-Net (sand), checked against
+     the Camsizer size distribution};
+  \node[inp=\B, below=8mm of pre, xshift=-57mm] (iA)
+    {paired greyscale volumes\\+ grain labels};
+  \node[inp=\B, below=8mm of pre, xshift=-19mm] (iB)
+    {phase maps + grain labels\\+ matched grain pairs};
+  \node[inp=\B, below=8mm of pre, xshift=19mm] (iC)
+    {phase maps + grain labels\\on a fixed core or\\in the bead envelope};
+  \node[inp=\B, below=8mm of pre, xshift=57mm] (iD)
+    {ice phase of $128^3$-voxel\\cubes inside the column};
+
+  \node[ana=\B, below=5mm of iA] (kin)
+    {\textbf{A\enspace Kinematics}\\[3pt]
+     bead DDIC, grey values matched in label-selected regions (SPAM)\\[2pt]
+     sand tracking from labels and column length (custom)\\[2pt]
+     accepted translations $\to$ neighbourhood gradient, strain, packing
+     rotation (custom)};
+  \node[ana=\B, below=5mm of iB] (bond)
+    {\textbf{B\enspace Ice bonds}\\[3pt]
+     throat lens, neck and ice connectivity per pair (custom)\\[2pt]
+     survival of first-scan bonds\\[2pt]
+     face coverage of cracked throats, cohesive / adhesive\\[2pt]
+     breakage-event clustering};
+  \node[ana=\B, below=5mm of iC] (str)
+    {\textbf{C\enspace Structure}\\[3pt]
+     core phase fractions, air--solid voxel-face area, 26-connected air
+     spanning (custom)\\[2pt]
+     Kozeny--Carman estimate (algebraic, custom)\\[2pt]
+     void / crack / separation classes in the bead envelope (custom)};
+  \node[ana=\B, below=5mm of iD] (tra)
+    {\textbf{D\enspace Ice diffusion}\\[3pt]
+     continuum finite-volume diffusion, $c=1/0$ on the axial faces,
+     periodic sides (PuMA)\\[2pt]
+     axial $D_\mathrm{eff}$ $\to$
+     $\tau_\mathrm{ice}=\phi_\mathrm{ice}D_0/D_\mathrm{eff}$};
+
+  \node[ctrl=\B, anchor=north] (cA) at ([yshift=-5mm]kin.south |- kin.south)
+    {convergence and volume-ratio gates; reciprocity against a displaced
+     predictor; near-zero increment of A4};
+  \node[ctrl=\B, anchor=north] (cB) at ([yshift=-5mm]bond.south |- kin.south)
+    {classifier run on the unloaded scan; breakages resampled from the
+     bonds present, 400 draws};
+  \node[ctrl=\B, anchor=north] (cC) at ([yshift=-5mm]str.south |- kin.south)
+    {unloaded scan as baseline; near-zero increment of A4 as the floor;
+     core band and radius varied};
+  \node[ctrl=\B, anchor=north] (cD) at ([yshift=-5mm]tra.south |- kin.south)
+    {cube accepted only if $D_{\mathrm{eff},z}>0$ and $\tau\ge1$;
+     a single cube drawn hollow};
+
+  % ---- 4. outputs -----------------------------------------------------------
+  \coordinate (cmid) at (0,0 |- cA.south);
+  \node[stage=\W, below=21mm of cmid] (res)
+    {Per specimen and load step, grain displacement, strain and rotation
+     fields; bond survival, failure mode and bond geometry; crack volumes by
+     position and orientation; core porosity, specific surface, connectivity,
+     permeability estimate and ice tortuosity};
+
+  % ---- the four stage containers ------------------------------------------
+  \begin{scope}[on background layer]
+    \node[grp=teal,   fit=(mat)]                        (gA) {};
+    \node[grp=orange, fit=(rig)(ct)]                    (gB) {};
+    \node[grp=violet, fit=(pre)(iA)(iD)(cA)(cD)]        (gC) {};
+    \node[grp=olive,  fit=(res)]                        (gD) {};
+  \end{scope}
+  \node[tag=teal]   at ([yshift=1mm]gA.north west) {1\quad Preparation};
+  \node[tag=orange] at ([yshift=1mm]gB.north west) {2\quad Apparatus and imaging};
+  \node[tag=violet] at ([yshift=1mm]gC.north west) {3\quad Analysis, by what each branch takes in};
+  \node[tag=olive]  at ([yshift=1mm]gD.north west) {4\quad Measured outputs};
+
+  % ---- flow -----------------------------------------------------------------
+  \draw[ar] (gA.south) -- (gB.north);
+  \draw[ar] (gB.south) -- (gC.north);
+  \draw[ar] (gC.south) -- (gD.north);
+  \draw[ar] (rig) -- (ct);
+  \foreach \i/\n/\c in {iA/kin/cA, iB/bond/cB, iC/str/cC, iD/tra/cD}{
+    \draw[ar] (pre.south) -- ++(0,-4mm) -| (\i.north);
+    \draw[ar] (\i) -- (\n);
+    \draw[ar] (\n) -- (\c);
+  }
+  % the bond branch also takes the matched pairs of the kinematics branch
+  \draw[ar, dashed] (kin.east) -- (bond.west);
+\end{tikzpicture}
