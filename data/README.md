@@ -26,3 +26,15 @@ The per-throat, per-pair and per-bead tables of the bond census are under
 `paper/data/ice_tortuosity/`, the clustering sweeps under
 `paper/data/planar_sweep/`, and the trained sand U-Net under
 `analysis/sand_segmentation/dl/model/`.
+
+```
+phase_maps_bin2/          <specimen>_<scan>.npz: the three-phase map of every scan (0 outside,
+                          1 air, 2 ice, 3 grain) binned 2x2x2 to 49.5 um, the input of the
+                          PuMA tortuosity solve, the 26-connectivity test and the ice-path maps
+```
+
+## Full-resolution volumes
+
+The reconstructions (24.77 um, uint16), the full-resolution phase maps and
+the grain labels of all 30 scans total about 60 GB and are deposited
+separately (see the Data and code availability statement of the paper).
