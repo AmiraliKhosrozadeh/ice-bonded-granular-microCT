@@ -1,0 +1,42 @@
+{
+  "S1_12": {
+    "pair": "S1_12",
+    "n_broke": 183,
+    "n_bond": 18207,
+    "knn": 2.0896447389468724,
+    "q_min": 0.6666666666666666,
+    "significant": false,
+    "dip": null,
+    "orientation": null
+  },
+  "S2_12": {
+    "pair": "S2_12",
+    "n_broke": 386,
+    "n_bond": 34838,
+    "knn": 1.4716578143412304,
+    "q_min": 0.6,
+    "significant": false,
+    "dip": null,
+    "orientation": null
+  },
+  "S2_23": {
+    "pair": "S2_23",
+    "n_broke": 48,
+    "n_bond": 371,
+    "knn": 3.430719816973914,
+    "q_min": 0.4,
+    "significant": false,
+    "dip": null,
+    "orientation": null
+  },
+  "S3_12": {
+    "pair": "S3_12",
+    "n_broke": 78,
+    "n_bond": 518,
+    "knn": 2.935799688800935,
+    "q_min": 1.0,
+    "significant": false,
+    "dip": null,
+    "orientation": null
+  }
+}

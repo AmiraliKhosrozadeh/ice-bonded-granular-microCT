@@ -1,0 +1,54 @@
+{
+  "S1_12": [
+    {
+      "shift_spacings": 0.0,
+      "n": 23410,
+      "reciprocal": 20336,
+      "rate": 0.8686885946176848
+    },
+    {
+      "shift_spacings": 0.5,
+      "n": 9407,
+      "reciprocal": 0,
+      "rate": 0.0
+    },
+    {
+      "shift_spacings": 1.0,
+      "n": 9417,
+      "reciprocal": 0,
+      "rate": 0.0
+    },
+    {
+      "shift_spacings": 2.0,
+      "n": 8915,
+      "reciprocal": 0,
+      "rate": 0.0
+    }
+  ],
+  "S2_12": [
+    {
+      "shift_spacings": 0.0,
+      "n": 29211,
+      "reciprocal": 23439,
+      "rate": 0.8024032042723631
+    },
+    {
+      "shift_spacings": 0.5,
+      "n": 13526,
+      "reciprocal": 0,
+      "rate": 0.0
+    },
+    {
+      "shift_spacings": 1.0,
+      "n": 13597,
+      "reciprocal": 0,
+      "rate": 0.0
+    },
+    {
+      "shift_spacings": 2.0,
+      "n": 13234,
+      "reciprocal": 0,
+      "rate": 0.0
+    }
+  ]
+}

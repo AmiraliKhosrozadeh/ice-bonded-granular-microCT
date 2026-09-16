@@ -55,6 +55,9 @@ paper/
                          per-bead tables of every bead specimen
 supplementary/           supplementary.pdf and its figures: method settings and provenance,
                          crack classes, crack orientation and ice-path maps for every scan
+data/                    the intermediate data the tables are built from: spam-ddic outputs,
+                         composed kinematic fields, sand tracking outputs, crack-class masks,
+                         Camsizer references (see data/README.md)
 templates/               per-specimen template documenting how the scripts are adapted
 ```
 
