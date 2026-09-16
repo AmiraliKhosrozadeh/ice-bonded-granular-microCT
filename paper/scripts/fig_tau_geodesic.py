@@ -54,7 +54,27 @@ RVOX_A3 = 19
 MAIN = ["G1", "G3", "A2", "S3"]
 SPECS = [(k, k[0], v, RVOX_A3 if k == "A3" else RVOX[k[0]]) for k, v in ALL.items()]
 DS = int(os.environ.get("TAU_DS", "1"))         # extra downsampling on top of bin2
+FULL = os.environ.get("TAU_FULL", "0") == "1"    # full-resolution phase maps (sand only)
+WEIGHT_MM = float(os.environ.get("TAU_WEIGHT_MM", "0"))   # if > 0, the path cost is 1 / local ice
+                                                 # fraction over a window of this size, so a porous
+                                                 # zone lengthens the path even if the ice still bridges it
 VOX_MM = 0.0495320458 * DS
+
+
+def full_for(pid):
+    """full resolution is used for the sand only, where the ice is fine"""
+    return FULL and pid.startswith("S")
+
+
+def vox_of(pid):
+    return (0.0247660229 if full_for(pid) else 0.0495320458) * DS
+E = "E:/RPTU-images/CT_images/Alumina/pyalumina/results/_xmat/sand"
+SC = ("C:/Users/cak7496/AppData/Local/Temp/claude/D--wsl/"
+      "ce923714-58c7-48fb-8bce-70f1eccee47f/scratchpad/micro/stage1/_xmat/sand")
+FULLPATH = {("S1", 1): f"{E}/100_500_T5/scan01", ("S1", 2): f"{SC}/100_500_T5/scan02",
+            ("S2", 1): f"{E}/25mm_100_500/scan01", ("S2", 2): f"{SC}/25mm_100_500/scan02",
+            ("S2", 3): f"{SC}/25mm_100_500/scan03",
+            ("S3", 1): f"{E}/75_200_T5/scan01", ("S3", 2): f"{SC}/75_200_T5/scan02"}
 MODE = os.environ.get("TAU_MODE", "excess")
 CLIP = os.environ.get("TAU_CLIP", "1") == "1"   # draw the half column
 SEED = os.environ.get("TAU_SEED", "support")     # or "punch"
@@ -76,12 +96,19 @@ def majority(mask, k):
 
 
 def field(pid, stage, r_vox):
-    f = os.path.join(CACHE, f"{pid}_{stage}_{MODE}_{SEED}_ds{DS}.npz")
+    FULLP = full_for(pid)
+    VOX_MM = vox_of(pid)
+    f = os.path.join(CACHE, f"{pid}_{stage}_{MODE}_{SEED}_ds{DS}{'_full' if FULLP else ''}{'_w%g' % WEIGHT_MM if WEIGHT_MM else ''}.npz")
     if os.path.exists(f):
         z = np.load(f)
         return z["val"], z["big"], z["ice"], int(z["halo"])
-    d = np.load(os.path.join(BIN2, f"{pid}_{stage}.npz"))
-    ph = d["phase"]
+    if FULLP:
+        import tifffile
+        ph = tifffile.imread(f"{FULLPATH[(pid, stage)]}/stage1/phase_labels.tif")
+        r_vox = r_vox * 2                       # the clearance was given at bin2
+    else:
+        d = np.load(os.path.join(BIN2, f"{pid}_{stage}.npz"))
+        ph = d["phase"]
     # the platens and the punch are classed as phase mixtures of a composition
     # no packing has; the column is the longest run of slices of packing composition
     ins = (ph > 0).sum(axis=(1, 2)).astype(float)
@@ -113,7 +140,22 @@ def field(pid, stage, r_vox):
     big = cc == sizes.argmax()
     zz = np.nonzero(big.any(axis=(1, 2)))[0]
     z_src = int(zz[-1] if SEED == "support" else zz[0])        # support is high z, punch low z
-    mcp = MCP_Geometric(np.where(big, 1.0, np.inf), sampling=(1.0, 1.0, 1.0))
+    if WEIGHT_MM > 0:
+        w = max(3, int(round(WEIGHT_MM / VOX_MM)) | 1)
+        # ice fraction of the packing within the window, normalised by how much
+        # of the window lies inside the envelope, so the lateral surface and
+        # the ends do not read as porous
+        envf = majority(env, DS) if DS > 1 else env
+        frac = ndi.uniform_filter(big.astype(np.float32), size=w, mode="constant")
+        inside = ndi.uniform_filter(envf.astype(np.float32), size=w, mode="constant")
+        frac = frac / np.maximum(inside, 0.05)
+        del inside, envf
+        cost = np.where(big, 1.0 / np.clip(frac, 0.1, 1.0), np.inf)
+        del frac
+    else:
+        cost = np.where(big, 1.0, np.inf)
+    mcp = MCP_Geometric(cost, sampling=(1.0, 1.0, 1.0))
+    del cost
     # seed from a 1 mm slab, not one slice, so that the seed face covers the
     # whole cross-section and no side of the column starts with a lateral run
     n_seed = max(1, int(1.0 / VOX_MM))
@@ -135,7 +177,7 @@ def field(pid, stage, r_vox):
         prof = np.array([np.nanmedian(val[z]) if np.isfinite(val[z]).any() else np.nan
                          for z in range(val.shape[0])])
         dist = np.abs(np.arange(val.shape[0]) - z_src)
-        pf = os.path.join(CACHE, f"{pid}_baseline.npz")
+        pf = os.path.join(CACHE, f"{pid}_baseline{'_full' if FULLP else ''}{'_w%g' % WEIGHT_MM if WEIGHT_MM else ''}.npz")
         if stage == 1 or not os.path.exists(pf):
             np.savez(pf, dist=dist, prof=prof)
         b = np.load(pf)
@@ -214,8 +256,8 @@ def main():
         for st in stages:
             val, big, ice, halo = field(pid, st, r)
             if os.environ.get("TAU_HALO_MM"):
-                halo = int(float(os.environ["TAU_HALO_MM"]) / VOX_MM)
-            png = os.path.join(CACHE, f"{pid}_{st}_{MODE}_{SEED}_ds{DS}_clip{int(CLIP)}_fade{FADE}.png")
+                halo = int(float(os.environ["TAU_HALO_MM"]) / vox_of(pid))
+            png = os.path.join(CACHE, f"{pid}_{st}_{MODE}_{SEED}_ds{DS}_clip{int(CLIP)}_fade{FADE}{'_full' if full_for(pid) else ''}{'_w%g' % WEIGHT_MM if WEIGHT_MM else ''}.png")
             if not os.path.exists(png):
                 render(val, big, ice, halo, png, shell=0.015 if pid.startswith("S") else 0.06)
             row.append((st, crop(png)))
