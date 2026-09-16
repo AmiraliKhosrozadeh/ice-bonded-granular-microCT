@@ -51,7 +51,7 @@ ALL = {"G1": (1, 2, 3), "G2": (1, 2), "G3": (1, 2, 3, 4), "G4": (1, 2), "G5": (1
        "S1": (1, 2), "S2": (1, 2, 3), "S3": (1, 2)}
 RVOX = {"G": 36, "A": 36, "S": 20}              # bead radius in full-res voxels (sand: 1 mm clearance)
 RVOX_A3 = 19
-MAIN = ["G1", "G3", "A2"]
+MAIN = ["G1", "G3", "A2", "S3"]
 SPECS = [(k, k[0], v, RVOX_A3 if k == "A3" else RVOX[k[0]]) for k, v in ALL.items()]
 DS = int(os.environ.get("TAU_DS", "1"))         # extra downsampling on top of bin2
 VOX_MM = 0.0495320458 * DS
@@ -236,7 +236,7 @@ def main():
     if len(panels) > 4:                           # the supplementary sheet, all specimens
         ncol = 4
     ncol = max(ncol, 4) if any(len(r) == 4 for _, _, r in panels) else ncol
-    fig = plt.figure(figsize=(ps.TW, (0.40 if len(panels) <= 4 else 0.52) * ps.TW * len(panels) + 0.6))
+    fig = plt.figure(figsize=(ps.TW, (0.285 if len(panels) <= 4 else 0.52) * ps.TW * len(panels) + 0.6))
     gs = fig.add_gridspec(len(panels) + 1, ncol, height_ratios=[1] * len(panels) + [0.10],
                           hspace=0.10, wspace=0.04, left=0.02, right=0.98, top=0.965, bottom=0.11)
     for i, (pid, mat, row) in enumerate(panels):
