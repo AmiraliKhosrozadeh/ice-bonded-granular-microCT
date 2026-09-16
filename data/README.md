@@ -36,5 +36,5 @@ phase_maps_bin2/          <specimen>_<scan>.npz: the three-phase map of every sc
 ## Full-resolution volumes
 
 The reconstructions (24.77 um, uint16), the full-resolution phase maps and
-the grain labels of all 30 scans total about 60 GB and are deposited
-separately (see the Data and code availability statement of the paper).
+the grain labels of all 30 scans total about 60 GB and are available from
+the corresponding author on request.
