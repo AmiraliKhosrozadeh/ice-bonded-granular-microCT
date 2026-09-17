@@ -280,7 +280,7 @@ def main():
     ncol = max(ncol, 4) if any(len(r) == 4 for _, _, r in panels) else ncol
     fig = plt.figure(figsize=(ps.TW, (0.285 if len(panels) <= 4 else 0.52) * ps.TW * len(panels) + 0.6))
     gs = fig.add_gridspec(len(panels) + 1, ncol, height_ratios=[1] * len(panels) + [0.10],
-                          hspace=0.10, wspace=0.04, left=0.02, right=0.98, top=0.965, bottom=0.11)
+                          hspace=0.28, wspace=0.04, left=0.02, right=0.98, top=0.96, bottom=0.11)
     for i, (pid, mat, row) in enumerate(panels):
         for j in range(ncol):
             ax = fig.add_subplot(gs[i, j])
