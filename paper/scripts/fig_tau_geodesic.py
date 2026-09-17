@@ -53,7 +53,7 @@ ALL = {"G1": (1, 2, 3), "G2": (1, 2), "G3": (1, 2, 3, 4), "G4": (1, 2), "G5": (1
        "S1": (1, 2), "S2": (1, 2, 3), "S3": (1, 2)}
 RVOX = {"G": 36, "A": 36, "S": 20}              # bead radius in full-res voxels (sand: 1 mm clearance)
 RVOX_A3 = 19
-MAIN = ["G1", "G3", "A2", "S3"]
+MAIN = ["G1", "G3", "A4", "S3"]
 SPECS = [(k, k[0], v, RVOX_A3 if k == "A3" else RVOX[k[0]]) for k, v in ALL.items()]
 DS = int(os.environ.get("TAU_DS", "1"))         # extra downsampling on top of bin2
 FULL = os.environ.get("TAU_FULL", "1") == "1"    # full-resolution phase maps (sand only)
