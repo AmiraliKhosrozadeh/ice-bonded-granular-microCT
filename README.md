@@ -61,6 +61,15 @@ data/                    the intermediate data the tables are built from: spam-d
 templates/               per-specimen template documenting how the scripts are adapted
 ```
 
+## Results for every specimen
+
+The paper shows one or two specimens per figure.  The same rendering for
+every specimen and every scan is in [`supplementary/`](supplementary/README.md):
+the void and crack classes (Fig. 11 of the paper), the crack orientation
+classes (Fig. 12), the ice-path maps (Fig. 18) and the per-scan tables behind
+Tables 2–4, each as one sheet per material, compiled with their text in
+[`supplementary/supplementary.pdf`](supplementary/supplementary.pdf).
+
 ## Software
 
 SPAM 0.9 (`spam-ddic`), pumapy 3.2.2, scikit-image, scikit-learn, scipy,
