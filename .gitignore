@@ -71,3 +71,7 @@ Thumbs.db
 TODO.txt
 NOTES.txt
 *.log
+
+# The supplementary sheets and PDF are results, kept
+!supplementary/*.png
+!supplementary/*.pdf

@@ -45,13 +45,13 @@ of the paper.  Table~\ref{tab:crack} gives the volumes.
 
 \begin{figure}[p]
   \centering
-  \includegraphics[width=\linewidth]{supplementary/crack3d_glass.png}
+  \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{supplementary/crack3d_glass.png}
   \caption{Void and crack classes at every scan of the glass specimens.}
   \label{fig:crack_glass}
 \end{figure}
 \begin{figure}[p]
   \centering
-  \includegraphics[width=\linewidth]{supplementary/crack3d_alumina.png}
+  \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{supplementary/crack3d_alumina.png}
   \caption{Void and crack classes at every scan of the $\gamma$-alumina specimens.}
   \label{fig:crack_alumina}
 \end{figure}
@@ -76,13 +76,13 @@ direction of a damage zone, not as fracture planes.
 
 \begin{figure}[p]
   \centering
-  \includegraphics[width=\linewidth]{supplementary/crackdir_glass.png}
+  \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{supplementary/crackdir_glass.png}
   \caption{Crack orientation classes of the glass specimens.}
   \label{fig:dir_glass}
 \end{figure}
 \begin{figure}[p]
   \centering
-  \includegraphics[width=\linewidth]{supplementary/crackdir_alumina.png}
+  \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{supplementary/crackdir_alumina.png}
   \caption{Crack orientation classes of the $\gamma$-alumina specimens.}
   \label{fig:dir_alumina}
 \end{figure}
@@ -93,31 +93,38 @@ the paper for every specimen.  For every ice voxel the shortest path
 through the ice from the support face is computed with a cost inversely
 proportional to the local ice fraction in a \SI{0.5}{\milli\meter} window
 (normalised by the part of the window inside the grain envelope, so the
-lateral surface does not read as porous); the ratio of that path to the
-axial distance is divided by its per-height median in the unloaded column,
-and ice at least $15\%$ above the unloaded column is drawn solid and
-coloured, the remaining ice as a faint shell.  The map is computed inside
-the grain envelope on the largest 26-connected ice body, on the
-$2\times$-binned phase maps for the beads and the full-resolution phase
-maps for the sand, seeded from a \SI{1}{\milli\meter} slab at the support
-face with the \SI{4}{\milli\meter} next to the seed cut; the patches near
-the support of the unloaded columns are the floor of the map.
+lateral surface does not read as porous).  The support face is treated as
+an equal-potential boundary, as in the diffusion solve: every ice voxel
+that is the first of its axial line from the support, within
+\SI{3}{\milli\meter} of it, seeds the path, and the axial distance is
+measured from that seed surface.  The ratio of path to axial distance is
+divided by its median at the same height in the unloaded column of the same
+specimen, and ice above the 99.5th percentile of the unloaded column at the
+same height (bodies of at least \SI{0.5}{\milli\meter\cubed}) is drawn
+solid and coloured, the remaining ice as a faint shell, so an unloaded
+column is blank by construction and a loaded one shows only what exceeds
+the unloaded range.  The map is computed inside the grain envelope on the
+largest 26-connected ice body, on the $2\times$-binned phase maps for the
+beads and the full-resolution phase maps for the sand, whose envelope is
+pulled in by \SI{1}{\milli\meter} to leave out the ice-rich skin the sand
+packs against the tube wall; the \SI{6}{\milli\meter} next to the support
+face are cut, and a line separates the unloaded scan from the loaded ones.
 
 \begin{figure}[p]
   \centering
-  \includegraphics[width=\linewidth]{supplementary/tau_geodesic_glass.png}
+  \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{supplementary/tau_geodesic_glass.png}
   \caption{Ice-path maps of the glass specimens.}
   \label{fig:tau_glass}
 \end{figure}
 \begin{figure}[p]
   \centering
-  \includegraphics[width=\linewidth]{supplementary/tau_geodesic_alumina.png}
+  \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{supplementary/tau_geodesic_alumina.png}
   \caption{Ice-path maps of the $\gamma$-alumina specimens.}
   \label{fig:tau_alumina}
 \end{figure}
 \begin{figure}[p]
   \centering
-  \includegraphics[width=\linewidth]{supplementary/tau_geodesic_sand.png}
+  \includegraphics[width=\linewidth,height=0.9\textheight,keepaspectratio]{supplementary/tau_geodesic_sand.png}
   \caption{Ice-path maps of the sand specimens.}
   \label{fig:tau_sand}
 \end{figure}
@@ -167,6 +174,7 @@ the support of the unloaded columns are the floor of the map.
     and the resampling $p$.  The pre-specified radius is $1.0$.}
   \label{tab:cluster}
   \scriptsize
+  \renewcommand{\arraystretch}{0.82}
   \input{supplementary/tab_cluster.tex}
 \end{table}
 
