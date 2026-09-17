@@ -345,11 +345,13 @@ def main():
                 render(val, big, ice, halo, png, shell=0.015 if pid.startswith("S") else 0.06, fade=fade_z, vox=vox_of(pid))
             row.append((st, crop(png)))
         panels.append((pid, mat, row))
-    # pad every panel of a row to the row's height so the titles sit level;
-    # the punch end stays at the top
+    # pad every panel of a row to the row's height and every panel of the
+    # figure to one width, so the columns line up as a table and the rule
+    # between the unloaded and the loaded columns is one straight line; the
+    # punch end stays at the top
+    W = max(im.shape[1] for _, _, r in panels for _, im in r)
     for _, _, r in panels:
         H = max(im.shape[0] for _, im in r)
-        W = max(im.shape[1] for _, im in r)
         for k, (st, im) in enumerate(r):
             can = np.full((H, W, 3), 255, np.uint8)
             x0 = (W - im.shape[1]) // 2
@@ -364,23 +366,31 @@ def main():
     h_in = (0.255 if len(panels) <= 4 else 0.25) * ps.TW * len(panels) + 0.95
     fig = plt.figure(figsize=(ps.TW, h_in))
     gs = fig.add_gridspec(len(panels) + 1, ncol, height_ratios=[1] * len(panels) + [0.10],
-                          hspace=0.28, wspace=0.04, left=0.02, right=0.98, top=1 - 0.22 / h_in,
+                          hspace=0.12, wspace=0.04, left=0.06, right=0.98, top=1 - 0.30 / h_in,
                           bottom=0.92 / h_in)
+    axes = {}
     for i, (pid, mat, row) in enumerate(panels):
         for j in range(ncol):
             ax = fig.add_subplot(gs[i, j])
             ax.set_axis_off()
+            axes[i, j] = ax
             if j < len(row):
-                st, im = row[j]
-                ax.imshow(im)
-                ax.set_title(f"{pid}, {'unloaded' if st == 1 else f'load step {st}'}", fontsize=9, pad=3)
-            if j == 0:
-                # a light rule between the unloaded column and the loaded ones
-                bb = ax.get_position()
-                xr = bb.x1 + 0.5 * (fig.add_subplot(gs[i, 1]).get_position().x0 - bb.x1)
-                fig.axes[-1].remove()
-                fig.add_artist(plt.Line2D([xr, xr], [bb.y0 - 0.005, bb.y1 + 0.03], transform=fig.transFigure,
-                                          color="0.6", linewidth=0.8, alpha=0.8))
+                ax.imshow(row[j][1])
+        # the specimen as a row label, left of its unloaded panel
+        bb = axes[i, 0].get_position()
+        fig.text(bb.x0 - 0.012, 0.5 * (bb.y0 + bb.y1), pid, fontsize=9, ha="right", va="center")
+    # the load steps as column headers, once, like a table
+    ytop = axes[0, 0].get_position().y1
+    for j in range(ncol):
+        bb = axes[0, j].get_position()
+        fig.text(0.5 * (bb.x0 + bb.x1), ytop + 0.16 / h_in, "unloaded" if j == 0 else f"load step {j + 1}",
+                 fontsize=9, ha="center", va="bottom")
+    # one light rule between the unloaded column and the loaded ones
+    b0, b1 = axes[0, 0].get_position(), axes[0, 1].get_position()
+    xr = 0.5 * (b0.x1 + b1.x0)
+    ylo = axes[len(panels) - 1, 0].get_position().y0
+    fig.add_artist(plt.Line2D([xr, xr], [ylo - 0.01, b0.y1 + 0.28 / h_in], transform=fig.transFigure,
+                              color="0.6", linewidth=0.8, alpha=0.8))
     cb_ax = fig.add_axes([0.28, 0.075, 0.44, 0.014])
     if MODE == "ratio":
         sm = plt.cm.ScalarMappable(cmap="turbo", norm=plt.Normalize(*RATIO_LIM))
