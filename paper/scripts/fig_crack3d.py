@@ -16,6 +16,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paper_style as ps
+
 # renders re-made inside a bead-bounded specimen mask by rerender_g3_tight.py
 SRC = (r"E:/RPTU-images/CT_images/Glass/Glass_100_1700_T7/Glass_1700_spam/"
        r"results_voidcrack/tight2")
@@ -111,6 +115,7 @@ axl.legend(handles=[Patch(facecolor=C_VOID, edgecolor="0.3", label="void"),
            fontsize=9, handlelength=1.6, columnspacing=1.2,
            handletextpad=0.5, borderpad=0.45)
 
+ps.add_triad(fig, 0.0, 0.0, 0.45 / TW, 0.45 / fig_h, fontsize=7)
 fig.savefig(OUT, dpi=400, facecolor="white")
 plt.close(fig)
 print("->", OUT, "%.1f MB" % (os.path.getsize(OUT) / 1e6))

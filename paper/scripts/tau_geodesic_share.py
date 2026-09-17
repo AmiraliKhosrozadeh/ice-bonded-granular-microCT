@@ -1,5 +1,8 @@
-"""Share of the ice above the unloaded column's range in the ice-path map of
-every scan (the rule of fig_tau_geodesic.py, from its cached fields).
+"""Share of the ice coloured in the ice-path map of every scan (the rule of
+fig_tau_geodesic.py, from its cached fields): in the paper's heal mode, ice
+whose shortest path from the support is lengthened by more than TAU_FADE mm
+by the crack air of the scan; in relratio mode, ice above the unloaded
+column's range at the same height.
 
     python scripts/tau_geodesic_share.py
         -> supplementary/tab_taumap.tex, scripts/data/tau_geodesic_share.csv
@@ -38,8 +41,11 @@ def share(val, dist0, thr0, vox, halo):
     dz = np.abs(np.arange(Z) - (Z - 1 if tg.SEED == "support" else 0)) * vox
     o = np.argsort(dist0)
     t = np.interp(dz, dist0[o], thr0[o])[:, None, None]
-    v = val[:-halo] if tg.SEED == "support" else val[halo:]
-    t = t[:-halo] if tg.SEED == "support" else t[halo:]
+    if halo > 0:
+        v = val[:-halo] if tg.SEED == "support" else val[halo:]
+        t = t[:-halo] if tg.SEED == "support" else t[halo:]
+    else:
+        v = val
     hi = np.nan_to_num(v, nan=-1e9) > t
     hi = ndi.binary_opening(hi, iterations=1)
     lab, n = ndi.label(hi)
@@ -55,7 +61,10 @@ def main():
         vox = tg.vox_of(pid)
         halo = int(tg.HALO_MM / vox)
         val0, _, _, _ = tg.field(pid, stages[0], r)
-        dist0, thr0 = ceiling(val0, vox)
+        if tg.MODE == "heal":
+            dist0 = np.array([0.0, 1e9]); thr0 = np.array([tg.FADE, tg.FADE])
+        else:
+            dist0, thr0 = ceiling(val0, vox)
         for st in stages:
             val, big, ice, _ = tg.field(pid, st, r)
             s = share(val, dist0, thr0, vox, halo)

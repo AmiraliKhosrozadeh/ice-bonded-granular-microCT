@@ -42,6 +42,8 @@ def main():
     axl = fig.add_subplot(gs[3, :])
     axl.axis("off")
     axl.imshow(crop_all(LEGEND))
+    h_in = 0.36 * ps.TW * 3 + 0.55
+    ps.add_triad(fig, 0.01, 0.005, 0.6 / ps.TW, 0.6 / h_in)
     fig.savefig(OUT, dpi=300, facecolor="white")
     print("->", OUT)
 

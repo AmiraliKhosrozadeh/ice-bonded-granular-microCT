@@ -53,11 +53,11 @@ ALL = {"G1": (1, 2, 3), "G2": (1, 2), "G3": (1, 2, 3, 4), "G4": (1, 2), "G5": (1
        "S1": (1, 2), "S2": (1, 2, 3), "S3": (1, 2)}
 RVOX = {"G": 36, "A": 36, "S": 20}              # bead radius in full-res voxels (sand: 1 mm clearance)
 RVOX_A3 = 19
-MAIN = ["G1", "G3", "A4", "S3"]
+MAIN = ["G1", "G3", "A4"]
 SPECS = [(k, k[0], v, RVOX_A3 if k == "A3" else RVOX[k[0]]) for k, v in ALL.items()]
 DS = int(os.environ.get("TAU_DS", "1"))         # extra downsampling on top of bin2
 FULL = os.environ.get("TAU_FULL", "1") == "1"    # full-resolution phase maps (sand only)
-WEIGHT_MM = float(os.environ.get("TAU_WEIGHT_MM", "0.5"))   # if > 0, the path cost is 1 / local ice
+WEIGHT_MM = float(os.environ.get("TAU_WEIGHT_MM", "0" if os.environ.get("TAU_MODE", "heal") == "heal" else "0.5"))   # if > 0, the path cost is 1 / local ice
                                                  # fraction over a window of this size, so a porous
                                                  # zone lengthens the path even if the ice still bridges it
 VOX_MM = 0.0495320458 * DS
@@ -77,7 +77,16 @@ FULLPATH = {("S1", 1): f"{E}/100_500_T5/scan01", ("S1", 2): f"{SC}/100_500_T5/sc
             ("S2", 1): f"{E}/25mm_100_500/scan01", ("S2", 2): f"{SC}/25mm_100_500/scan02",
             ("S2", 3): f"{SC}/25mm_100_500/scan03",
             ("S3", 1): f"{E}/75_200_T5/scan01", ("S3", 2): f"{SC}/75_200_T5/scan02"}
-MODE = os.environ.get("TAU_MODE", "relratio")
+MODE = os.environ.get("TAU_MODE", "heal")
+# heal: the extra length of the shortest ice path from the support that the
+# crack air of the scan forces, against the same ice with that air closed
+# (the same seeds), the crack air being the air inside the grain envelope
+# narrower than the crack-class width (what an opening of that width
+# removes); zero wherever no crack lies on the way, so an intact column is
+# blank by construction and no baseline is needed, and the wide pre-existing
+# pores of the alumina are not healed, as they are not cracks.
+# TAU_CRACK_MM=0 heals all the air instead (the unloaded alumina then colours)
+CRACK_MM = float(os.environ.get("TAU_CRACK_MM", "0.25"))
 CLIP = os.environ.get("TAU_CLIP", "0") == "1"   # draw the half column
 SEED = os.environ.get("TAU_SEED", "support")     # or "punch"
 # the support platen is an equal-potential face, as in the diffusion solve: with
@@ -88,7 +97,7 @@ SEED_FACE = os.environ.get("TAU_SEED_FACE", "1") == "1"
 # the drawing threshold is the unloaded column's own range at the same height,
 # this percentile of its field per 1 mm of height (empty: the fixed TAU_FADE)
 FADE_PCT = os.environ.get("TAU_FADE_PCT", "99.5")
-HALO_MM = float(os.environ.get("TAU_HALO_MM", "6"))   # next to the support, cut
+HALO_MM = float(os.environ.get("TAU_HALO_MM", "0" if MODE == "heal" else "6"))   # next to the support, cut
 SEED_MM = float(os.environ.get("TAU_SEED_MM", "3"))
 # TAU_CORE_MM > 0 pulls the sand envelope in by that margin, so the ice-rich
 # skin the sand packs against the tube wall (about 1 mm wide) is neither a
@@ -100,11 +109,12 @@ CORE_MM = float(os.environ.get("TAU_CORE_MM", "1"))
 def core_of(pid):
     return CORE_MM if pid.startswith("S") else 0.0
 ONLY = os.environ.get("TAU_SPECS")               # e.g. "G1,A2"
-FADE = float(os.environ.get("TAU_FADE", "1.15"))    # if > 0, only ice above this value is drawn opaque,
+FADE = float(os.environ.get("TAU_FADE", "0.3" if MODE == "heal" else "1.15"))    # if > 0, only ice above this value is drawn opaque,
                                                  # the rest of the column as a faint shell
 RATIO_LIM = (1.1, 1.6)
 REL_LIM = (1.0, 1.5)
 EXCESS_LIM = (0.0, 1.5)
+HEAL_LIM = (0.0, 3.0)                            # mm of extra path
 MIN_BODY_MM3 = float(os.environ.get("TAU_MIN_MM3", "0.5"))
 CMAP = "inferno_r"                               # pale where nothing changed, dark where the path is longest
 
@@ -120,7 +130,7 @@ def majority(mask, k):
 def field(pid, stage, r_vox):
     FULLP = full_for(pid)
     VOX_MM = vox_of(pid)
-    f = os.path.join(CACHE, f"{pid}_{stage}_{MODE}_{SEED}{'face' if SEED_FACE else ''}{'_core%g' % core_of(pid) if core_of(pid) else ''}_ds{DS}{'_full' if FULLP else ''}{'_w%g' % WEIGHT_MM if WEIGHT_MM else ''}.npz")
+    f = os.path.join(CACHE, f"{pid}_{stage}_{MODE}{'%g' % CRACK_MM if MODE == 'heal' and CRACK_MM else ''}_{SEED}{'face' if SEED_FACE else ''}{'_core%g' % core_of(pid) if core_of(pid) else ''}_ds{DS}{'_full' if FULLP else ''}{'_w%g' % WEIGHT_MM if WEIGHT_MM else ''}.npz")
     if os.path.exists(f):
         z = np.load(f)
         return z["val"], z["big"], z["ice"], int(z["halo"])
@@ -162,6 +172,22 @@ def field(pid, stage, r_vox):
                 env[z] = ndi.distance_transform_edt(env[z]) > m
     ice = majority((ph == 2) & env, DS)
     halo = int(HALO_MM / VOX_MM)                # slices next to the seed, cut
+    bigh = None
+    if MODE == "heal":
+        # the narrow air of the scan (what an opening of the crack-class width
+        # removes) is closed, and the largest ice body is taken inside that
+        # healed body, so both paths start from the same seeds
+        narrow = majority((ph == 1) & env, DS)
+        if CRACK_MM > 0:
+            r = max(1, int(round(CRACK_MM / VOX_MM / 2)))
+            wide = ndi.binary_opening(narrow, structure=ndi.generate_binary_structure(3, 1), iterations=r)
+            narrow = narrow & ~wide
+            del wide
+        cc, _ = ndi.label(ice | narrow, structure=np.ones((3, 3, 3)))
+        sizes = np.bincount(cc.ravel()); sizes[0] = 0
+        bigh = cc == sizes.argmax()
+        ice = ice & bigh
+        del narrow
     cc, _ = ndi.label(ice, structure=np.ones((3, 3, 3)))
     sizes = np.bincount(cc.ravel()); sizes[0] = 0
     big = cc == sizes.argmax()
@@ -202,6 +228,16 @@ def field(pid, stage, r_vox):
         zseed = np.full(anyc.shape, float(z_src))
         zseed[anyc] = z0 + first[anyc]
     geo, _ = mcp.find_costs(starts)
+    if MODE == "heal":
+        del mcp
+        geo_h, _ = MCP_Geometric(np.where(bigh, 1.0, np.inf), sampling=(1.0, 1.0, 1.0)).find_costs(starts)
+        val = np.full(big.shape, np.nan, np.float32)
+        okv = big & np.isfinite(geo) & np.isfinite(geo_h)
+        val[okv] = ((geo[okv] - geo_h[okv]) * VOX_MM).astype(np.float32)
+        print(f"{pid} {stage}: ice {ice.sum()} vox, extra path median {np.nanmedian(val):.3f} "
+              f"p99 {np.nanpercentile(val, 99):.3f} mm, {100 * np.mean(val[okv] > FADE):.2f} % above {FADE} mm", flush=True)
+        np.savez_compressed(f, val=val, big=big, ice=ice, halo=halo)
+        return val, big, ice, halo
     if SEED_FACE:
         eucl = np.abs(np.arange(big.shape[0], dtype=np.float32)[:, None, None] - zseed[None].astype(np.float32))
     else:
@@ -247,9 +283,9 @@ def render(val, big, ice, halo, out, shell=0.06, fade=None, vox=VOX_MM):
     fade = FADE if fade is None else fade
     mask = big.copy()
     rest = ice & ~mask
-    if SEED == "support":
+    if halo > 0 and SEED == "support":
         mask[-halo:] = False; rest[-halo:] = False
-    else:
+    elif halo > 0:
         mask[:halo] = False; rest[:halo] = False
     if CLIP:                                    # keep the half of the column facing the camera
         cy = mask.shape[1] // 2
@@ -280,7 +316,7 @@ def render(val, big, ice, halo, out, shell=0.06, fade=None, vox=VOX_MM):
         colour["v"] = np.where(np.isfinite(tv), tv, np.nanmin(val))
     if rest.any():
         p.add_mesh(mesh(rest)[0], color="#c8ccd0", smooth_shading=True)
-    lim = {"ratio": RATIO_LIM, "relratio": REL_LIM, "excess": EXCESS_LIM}[MODE]
+    lim = {"ratio": RATIO_LIM, "relratio": REL_LIM, "excess": EXCESS_LIM, "heal": HEAL_LIM}[MODE]
     if colour is not None:
         p.add_mesh(colour, scalars="v", cmap="turbo" if MODE != "excess" else CMAP, clim=lim,
                    smooth_shading=True, show_scalar_bar=False)
@@ -310,7 +346,7 @@ def main():
         for st in stages:
             val, big, ice, halo = field(pid, st, r)
             halo = int(HALO_MM / vox_of(pid))        # the cached value may be older
-            if st == stages[0] and FADE_PCT:
+            if st == stages[0] and FADE_PCT and MODE != "heal":
                 # the threshold is what the unloaded column reaches at the same
                 # distance from the support (a high percentile of its own field
                 # per 1 mm of height), so that only ice above the unloaded
@@ -340,7 +376,7 @@ def main():
             else:
                 fade_z = fade
                 ftag = f"fade{fade:.3f}"
-            png = os.path.join(CACHE, f"{pid}_{st}_{MODE}_{SEED}{'face' if SEED_FACE else ''}{'_core%g' % core_of(pid) if core_of(pid) else ''}_ds{DS}_clip{int(CLIP)}_{ftag}{'_full' if full_for(pid) else ''}{'_w%g' % WEIGHT_MM if WEIGHT_MM else ''}.png")
+            png = os.path.join(CACHE, f"{pid}_{st}_{MODE}{'%g' % CRACK_MM if MODE == 'heal' and CRACK_MM else ''}_{SEED}{'face' if SEED_FACE else ''}{'_core%g' % core_of(pid) if core_of(pid) else ''}_ds{DS}_clip{int(CLIP)}_{ftag}{'_full' if full_for(pid) else ''}{'_w%g' % WEIGHT_MM if WEIGHT_MM else ''}.png")
             if not os.path.exists(png):
                 render(val, big, ice, halo, png, shell=0.015 if pid.startswith("S") else 0.06, fade=fade_z, vox=vox_of(pid))
             row.append((st, crop(png)))
@@ -363,7 +399,7 @@ def main():
     if len(panels) > 4:                           # the supplementary sheet, all specimens
         ncol = 4
     ncol = max(ncol, 4) if any(len(r) == 4 for _, _, r in panels) else ncol
-    h_in = (0.255 if len(panels) <= 4 else 0.25) * ps.TW * len(panels) + 0.95
+    h_in = (0.34 if len(panels) <= 3 else 0.255 if len(panels) <= 4 else 0.25) * ps.TW * len(panels) + 0.95
     fig = plt.figure(figsize=(ps.TW, h_in))
     gs = fig.add_gridspec(len(panels) + 1, ncol, height_ratios=[1] * len(panels) + [0.10],
                           hspace=0.12, wspace=0.04, left=0.06, right=0.98, top=1 - 0.30 / h_in,
@@ -391,6 +427,7 @@ def main():
     ylo = axes[len(panels) - 1, 0].get_position().y0
     fig.add_artist(plt.Line2D([xr, xr], [ylo - 0.01, b0.y1 + 0.28 / h_in], transform=fig.transFigure,
                               color="0.6", linewidth=0.8, alpha=0.8))
+    ps.add_triad(fig, 0.04, 0.10 / h_in, 0.6 / ps.TW, 0.6 / h_in)
     cb_ax = fig.add_axes([0.28, 0.075, 0.44, 0.014])
     if MODE == "ratio":
         sm = plt.cm.ScalarMappable(cmap="turbo", norm=plt.Normalize(*RATIO_LIM))
@@ -398,6 +435,9 @@ def main():
     elif MODE == "relratio":
         sm = plt.cm.ScalarMappable(cmap="turbo", norm=plt.Normalize(*REL_LIM))
         label = "geodesic tortuosity of the ice path relative to the unloaded column, " + r"$\tau_\mathrm{g}/\tau_\mathrm{g,0}$"
+    elif MODE == "heal":
+        sm = plt.cm.ScalarMappable(cmap="turbo", norm=plt.Normalize(*HEAL_LIM))
+        label = "extra length of the shortest ice path from the support forced by the crack air (mm)"
     else:
         sm = plt.cm.ScalarMappable(cmap=CMAP, norm=plt.Normalize(*EXCESS_LIM))
         label = "extra length of the ice path from the support, relative to the unloaded column (mm)"

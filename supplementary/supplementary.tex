@@ -90,50 +90,45 @@ direction of a damage zone, not as fracture planes.
 \section{Ice-path maps of every specimen}
 Figures~\ref{fig:tau_glass}--\ref{fig:tau_sand} give the map of Fig.~18 of
 the paper for every specimen.  For every ice voxel the shortest path
-through the ice from the support face is computed with a cost inversely
-proportional to the local ice fraction in a \SI{0.5}{\milli\meter} window
-(normalised by the part of the window inside the grain envelope, so the
-lateral surface does not read as porous).  The support face is treated as
-an equal-potential boundary, as in the diffusion solve: every ice voxel
-that is the first of its axial line from the support, within
-\SI{3}{\milli\meter} of it, seeds the path, and the axial distance is
-measured from that seed surface.  The ratio of path to axial distance is
-divided by its median at the same height in the unloaded column of the same
-specimen, and ice above the 99.5th percentile of the unloaded column at the
-same height (bodies of at least \SI{0.5}{\milli\meter\cubed}) is drawn
-solid and coloured, the remaining ice as a faint shell, so an unloaded
-column is blank by construction and a loaded one shows only what exceeds
-the unloaded range.  The map is computed inside the grain envelope on the
-largest 26-connected ice body, on the $2\times$-binned phase maps for the
-beads and the full-resolution phase maps for the sand, whose envelope is
-pulled in by \SI{1}{\milli\meter} to leave out the ice-rich skin the sand
-packs against the tube wall; the \SI{6}{\milli\meter} next to the support
-face are cut, and a line separates the unloaded scan from the loaded ones.
-The paper shows G1, G3, A4 and S3; the share of the ice above the unloaded
-range is given in Table~\ref{tab:taumap}.  In the glass it follows the crack
-volume of Table~\ref{tab:crack}, G1 and G3 at their later steps far above
-the rest, G2 and G5 a small share each and G4 nothing.  In the
-$\gamma$-alumina A1 and A3 show nothing, and this is not a matter of the
-threshold, since the distribution of their loaded fields coincides with
-the unloaded one at every percentile (95th percentile $1.19$ against
-$1.19$ in A1, $1.15$ against $1.15$ in A3), so any threshold that coloured
-them would colour their unloaded columns as much; the PuMA tortuosity of
-Table~\ref{tab:tau} and the crack classes of Table~\ref{tab:crack} are
-unchanged in the same two specimens.  A2 shows a single body near the support
-despite the largest crack-volume gain of the four, and A4 the two bead
-layers under the punch at both steps, present already at its first
-increment (shortening $0.01$), which is the punch bedding into the top
-layer rather than an interior crack; two thirds or more of the cracked
-throats of A2 and A4 part at the grain face, so the ice network stays
-whole.  In the sand S1 shows nothing (its second scan is at zero
-shortening), S2 the outward flow of the head at its third step, and S3 the
-loaded third of the column with a tongue down the axis.
+through the ice from the support face (scikit-image
+\texttt{MCP\_Geometric}, unit cost) is compared with the same path through
+the ice with the crack air of that scan closed, the air inside the grain
+envelope narrower than the crack-class width of \S2.5.2 of the paper
+(what a \SI{0.25}{\milli\meter} opening removes, so the wide pre-existing
+pores of the $\gamma$-alumina, which are not cracks, stay open).  The
+support face is an equal-potential boundary as in the diffusion solve:
+every ice voxel that is the first of its axial line from the support,
+within \SI{3}{\milli\meter} of it, seeds both paths.  The difference is the
+detour the cracks force, zero wherever no crack lies on the way, so an
+unloaded column is blank by construction and no baseline or threshold on
+the unloaded scan is needed; ice detoured by more than
+\SI{0.3}{\milli\meter}, after one opening and dropping bodies below
+\SI{0.5}{\milli\meter\cubed}, is drawn solid and coloured by the detour,
+the remaining ice as a faint shell.  The map is computed inside the grain
+envelope on the largest 26-connected body of the healed ice, on the
+$2\times$-binned phase maps for the beads and the full-resolution phase
+maps for the sand, whose envelope is pulled in by \SI{1}{\milli\meter} to
+leave out the ice-rich skin the sand packs against the tube wall.  A line
+separates the unloaded scan from the loaded ones.
+
+The paper shows G1, G3 and A4; the share of the ice detoured at every scan
+is in Table~\ref{tab:taumap}.  In the glass it follows the crack volumes of
+Table~\ref{tab:crack}, G1 at its first loaded step and G3 at its last far
+above the rest, G2 and G5 a few per cent, G4 almost nothing.  In the
+$\gamma$-alumina A4 is the largest, the two bead layers under the punch at
+both steps, present already at the increment that imposed almost no
+shortening, which is the punch bedding into the top layer; A2 and A3 detour
+about one per cent and A1 nothing, since two thirds or more of the cracked
+throats of the $\gamma$-alumina part at the grain face, a separation the
+ice path runs past.  No sand specimen has crack air at any scan, so the
+sand maps are blank; the loosening of S3 (Fig.~15 of the paper) thins the
+ice without cutting it.
 
 \begin{table}[htbp]
   \centering
-  \caption{Share of the ice (inside the envelope, above the
-    \SI{6}{\milli\meter} cut) whose relative path exceeds the unloaded
-    column's range at the same height, per scan, in per cent.}
+  \caption{Share of the ice inside the envelope whose shortest path from
+    the support is lengthened by more than \SI{0.3}{\milli\meter} by the
+    crack air of the scan, per scan, in per cent.}
   \label{tab:taumap}
   \footnotesize
   \input{supplementary/tab_taumap.tex}

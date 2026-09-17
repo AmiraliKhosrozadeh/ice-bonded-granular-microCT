@@ -19,6 +19,8 @@ common width, cut from the source figures.  The source bar labels are erased
 and rewritten in the paper's font so the wording is the paper's.
 """
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -183,6 +185,14 @@ def compose(panels, out):
     f = ImageFont.truetype(FONT, FS_LETTER)
     for cx, t in letters:
         dr.text((cx, hmax + LAB // 2), t, fill='black', font=f, anchor='mm')
+    # axis triad at the lower left, on a band added below the panel letters
+    import paper_style as ps
+    px = int(round(0.11 * W))
+    tri = Image.fromarray(ps.triad_rgba(px))
+    tall = Image.new('RGBA', (img.size[0], img.size[1] + px - LAB // 2), (255, 255, 255, 255))
+    tall.paste(img.convert('RGBA'), (0, 0))
+    tall.alpha_composite(tri, (int(0.01 * W), tall.size[1] - px))
+    img = tall.convert('RGB')
     img.save(out)
     print('->', out, os.path.getsize(out) // 1024, 'kB', img.size)
 
