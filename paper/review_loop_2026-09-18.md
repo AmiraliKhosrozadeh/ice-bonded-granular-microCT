@@ -329,3 +329,49 @@ passages changed in rounds 1–9 as typeset.
 5. Fig. 9 was made outside the repository; its band labels use "scan 1/2"
    for the loaded scans, which the caption now translates, but relabelling
    the figure itself would be cleaner.
+
+## External pre-submission review (powder_technology_review_2026-09-18.md), validity check
+
+Each finding was checked against the manuscript, the data files and the
+analysis scripts. "Valid, fixed" means the manuscript was changed;
+"valid, author" means it needs information not in the files; "partly" and
+"not valid" are explained.
+
+| # | Finding | Verdict | Action |
+|---|---|---|---|
+| P2 | Alumina CV is 0.44/2.87 = 15 %, not 36 % | valid, fixed | §3.2 rewritten: glass 48 %, alumina and sand 15 %; only the glass is less repeatable, and the bridge-count explanation is now qualified |
+| P1 | Calibration chronology conflicts (pre-test deadweights in §2.2, post-test recalibration in §2.2, pre-test texture analyser in Appendix A) | valid, author | No calibration record in the repository; the author must state which calibration applied to which records |
+| P3 | Adhesive majority depends on threshold: 48.5 % at C_HI = 0.50 is not a majority, so "sets the size of the majority and not its direction" was false | valid, fixed | §3.3 now says the share is 48/75/85/93 %, a majority at every setting but the loosest, where the classes are even |
+| P4 | Separation is the observed final state, not a demonstrated sequence | valid, fixed | Abstract, highlight, §3.3 opening and Conclusions now say broken bonds are *found* separated at the last scan |
+| P5 | Permeability is a Kozeny–Carman estimate | partly (already stated in §3.6) | "Kozeny–Carman permeability estimate" now also in §4.1 and Conclusions; "cancelled" replaced by "offset … within a factor of two" |
+| P6 | Shape causality confounded with grain material | valid, fixed | §4.1 and Conclusions: one bead material per shape, shape and grain strength confounded, contrast exploratory |
+| 1 | Literature claim "overwhelmingly at rest" | valid, softened to "mostly" | author still to check recent in-situ frozen-soil CT |
+| 1 | Morphology similarity does not prove independence from the failure process | valid, fixed | now "the same mixed morphology has been seen under both freezing and loading" |
+| 2 | Temperature: controller −15 °C vs chamber −5 °C, sensor location, uniformity | valid, author | sensor position and uncertainty are not in the files |
+| 2 | Preparation details depend on an unpublished companion manuscript | valid, author | packing, water dosing, freezing history must come from the author |
+| 2 | Hold/relaxation during 22–31 min scans | partly (hold stated in §2.2 since round 2) | no relaxation record exists; the A4 near-zero increment (0.04 mm motion) is the only motion check and is already cited |
+| 3 | Sand model selected and scored on the same scans; PSD agreement does not validate boundaries or identity | valid, fixed | Limitations now say so explicitly and that no held-out deformed subvolume exists |
+| 3 | Bead thresholds: valleys (text) vs Otsu (caption) | valid, fixed | stage0 script `scan_histogram_analysis.py` takes the midpoints between the three histogram peaks; text and Fig. 3 caption now say midpoints / "the two thresholds" |
+| 3 | Sand phase assignment: Otsu three-class vs "quartz and ice share one mode" | valid, fixed | §2.4.1 now says the quartz fraction of Table 1 is taken from the labels, the histogram separating air from solid only |
+| 3 | Median matching criteria cannot establish every correspondence | valid, author | per-pair tables exist in the repository (paper/data/bonds); reporting per-match distributions is an addition, not a correction |
+| 4 | Number of companion tests, meaning of ± | valid, author | open since round 1 |
+| 4 | Strain at peak does not prove initial stiffness | valid, fixed | §3.2: "reaches its peak at the smallest shortening"; modulus stated as not evaluated |
+| 4 | "Twice as fast": define the fit | partly | the caption already says one line per material through the origin; weighting is equal per scan (fig_microevo.py) — left as is |
+| 5 | "Interface-proximal"/upper-bound wording; derive the 4.6-voxel limit | partly | the upper-bound statement exists in §3.3; the origin of 4.6 voxels is not in the files — author |
+| 5 | Broken fraction lower bound not proven | valid, fixed | §2.5.3 now gives retention (21–74 % of first-scan bonds followed, Tables 3 and 4) and the all-survive/all-fail bounds (9–87 % in G1), and calls the lower-estimate reading an assumption |
+| 5 | Lens footprint 0.40 R vs neck radius 0.72–0.83 R | valid clarification, fixed | the neck is the connected ice patch over the whole plane, not within the lens (Table 3 caption); §2.5.3 now says so |
+| 6 | Conduction conclusions need qualification | fixed with P5 | |
+| 6 | Voxel-face bias does not necessarily cancel | valid, fixed | §2.5.4: "largely cancels … which is an assumption" |
+| 6 | Acceptance criteria do not demonstrate convergence | valid, fixed | §2.5.4 now says the criteria are necessary not sufficient and residuals were not archived (checked: the ice_tortuosity JSON records D_eff and tau only) |
+| 6 | Tortuosity domain is cubes, not the core | valid, fixed | §3.6 opening corrected |
+| 6 | KC "cancel" requires S/S0 = (eps/eps0)^1.5 | valid, fixed | wording "offset … within a factor of two" (A1: 1.62^3/1.63^2 = 1.6, matches k/k0) |
+| 7 | Non-significant clustering does not prove absence of a front | valid, fixed | §3.3, abstract and highlight now "no planar organisation resolved"; synthetic-plane power test not done — author |
+| 7 | Null population should be the eligible (followed) bonds | valid clarification, fixed | planar_test.py already resamples from the followed bonds (`s[s.connected1]`); the text wrongly said "all bonds present"; corrected |
+| 7 | Reciprocity ≠ correctness; known-motion tests | partly (already acknowledged in §2.5.1) | known-motion test not done — author |
+| 7 | Stress-relief mechanism is a hypothesis | valid, fixed | "the kinematics suggest why"; Conclusions "consistent with" |
+| 8 | ChatGPT-assisted graphical images must be identified | valid, author | which figures were designed with ChatGPT is not in the files; Elsevier policy needs the tool named in the captions concerned |
+| 8 | Pin the repository to a release | valid, fixed | tag v1.0 pushed to GitHub and cited in Data availability |
+| 9 | Abstract colon and parallel list | partly | house style avoids colons; "namely" added instead |
+| 10 | Tube 15 mm ID vs bore radius 6.40 mm (12.8 mm) | valid, author | §2.2 lists a 15 mm PMMA cylinder and a 13 mm aluminium insert called the piston; the reconstructions show a 12.8 mm bore; the apparatus description must say which part the specimen sits in |
+| 10 | Sand grain 6.5 voxels vs 218 µm / 24.77 µm = 8.8 | valid, fixed | now "8–9 voxels (D50 194–225 µm)" |
+| 10 | Scan counts sum to 30; bond-table sums | correct, no change | |
