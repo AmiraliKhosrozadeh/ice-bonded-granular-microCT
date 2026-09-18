@@ -48,6 +48,9 @@ paper/
                            ice_tortuosity.py      PuMA continuum diffusion on interior cubes
                            specimen_tables.py     Tables 2-4 of the paper
                            fig_*.py               the figures
+                           acquisition_table.py   per-scan scanner record (Table S2)
+                         review_loop_2026-09-18.md is the log of the ten-round
+                         expert review of the manuscript and what it changed
   data/                  the tables behind the paper: bond geometry, failure mode at every
                          threshold, survival census, specimen summary, crack volumes, core
                          structure, ice tortuosity per cube, DIC summary, clustering sweeps,
